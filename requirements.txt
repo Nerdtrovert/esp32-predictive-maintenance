@@ -1,0 +1,4 @@
+# Python dependencies (if any scripts are used)
+# Edge Impulse CLI: npm install -g edge-impulse-cli
+pyserial>=3.5
+requests>=2.28.0
