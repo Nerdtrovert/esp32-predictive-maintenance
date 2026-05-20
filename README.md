@@ -52,6 +52,8 @@ graph TD
     B --> H[MQTT Telemetry]
     H --> I[ThingsBoard Cloud Dashboard]
     I --> G
+
+
 🚀 Quick Start
 
 Clone the repository
@@ -95,4 +97,4 @@ Advanced LSTM-based forecasting
 Integration with industrial protocols (Modbus)
 
 
-Made with ❤️ using Edge Impulse & ESP32
+Made using Edge Impulse & ESP32
