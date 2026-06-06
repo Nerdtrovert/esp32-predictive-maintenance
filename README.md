@@ -71,7 +71,7 @@ Dashboard: Real-time gauges, time-series with predicted trends, anomaly alerts
 Hardware Setup: Clean breadboard + sensor integration
 
 🔧 Hardware Connections- 
-![Hardware-connections](docs/circuit-connections.jpg)
+[![Circuit Connections](docs/circuit-connections.jpg)](docs/circuit-connections.jpg)
 Component,ESP32 Pin,Notes
 DHT11,GPIO 4,Temperature & Humidity
 MPU6050 SDA,GPIO 21,I2C
