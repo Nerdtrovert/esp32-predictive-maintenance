@@ -1,4 +1,4 @@
-# Edge AI Predictive Maintenance System
+# Machine Hawk Predictive Maintenance System
 
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
 ![ESP32](https://img.shields.io/badge/ESP32-Enabled-blue)
@@ -9,27 +9,27 @@
 
 ### What is it?
 
-An edge-based predictive-maintenance system that runs on a single ESP32. It samples temperature, humidity, and vibration data; forecasts temperature trends; uses an Edge Impulse TinyML model to score anomalies; and publishes telemetry to a ThingsBoard dashboard. When an anomaly is detected, the ESP32 activates a relay and status LED.
+Machine Hawk is an edge-based predictive maintenance system running on a single ESP32. It samples temperature, humidity, and vibration data; forecasts temperature trends using a moving average; utilizes a Tensor Flow Lite Micro / Edge Impulse TinyML model to detect and score anomalies; and publishes telemetry to a ThingsBoard dashboard via MQTT. When an anomaly is detected, the ESP32 automatically triggers a local relay and an alert status LED.
 
-### Why did you build it?
+### Why did we build it?
 
-The project explores how condition monitoring can run directly on low-cost embedded hardware, without a gateway or continuous cloud-side inference. It combines sensor processing, simple forecasting, TinyML, MQTT, and remote monitoring in one practical IoT system.
+The project explores how condition-monitoring can run directly on low-cost embedded hardware at the edge, without relying on external gateways or continuous cloud-side inference. It combines sensor processing, trend forecasting, TinyML, MQTT connectivity, and remote actuator override controls in one practical IoT system.
 
 ## Features
 
-- Reads temperature and humidity from a DHT11 and motion data from an MPU6050.
-- Smooths temperature readings with a moving average and estimates a near-term trend.
-- Runs on-device Edge Impulse inference for anomaly scoring.
-- Combines ML results with temperature and predicted-temperature thresholds.
-- Controls a 5 V relay and status LED when an anomaly is detected.
-- Sends temperature, predicted temperature, anomaly score, and anomaly state to ThingsBoard through MQTT.
-- Accepts ThingsBoard RPC messages for remote relay control.
+- **Multi-Sensor Acquisition**: Reads temperature/humidity (DHT11) and motion/acceleration (MPU6050).
+- **Trend Forecasting**: Smooths temperature readings with a moving average and estimates short-term trends.
+- **On-Device Inference**: Runs Edge Impulse TinyML inference on-device for anomaly scoring.
+- **Hybrid Decision Logic**: Combines TinyML anomaly scoring with rules-based temperature and trend threshold limits.
+- **Safety Tripping**: Triggers a 5 V safety isolation relay and alert LED when an anomaly is detected.
+- **Telemetry Sync**: Publishes diagnostics (temperatures, predicted temperature, anomaly score, status) to ThingsBoard.
+- **Remote Actuation Override**: Supports cloud-to-device RPC messages to control the relay remotely.
 
 ## Architecture
 
 ```mermaid
 flowchart LR
-    Sensors["DHT11 and MPU6050"] --> ESP32["ESP32"]
+    Sensors["DHT11 and MPU6050"] --> ESP32["ESP32 (Machine Hawk)"]
     ESP32 --> Processing["Filtering and trend prediction"]
     ESP32 --> TinyML["Edge Impulse TinyML inference"]
     Processing --> Decision["Hybrid decision logic"]
@@ -48,7 +48,7 @@ flowchart LR
 | Microcontroller | ESP32 DevKit |
 | Sensors | DHT11 and MPU6050 |
 | Edge ML | Edge Impulse SDK / TensorFlow Lite Micro |
-| Firmware | C++ with Arduino framework |
+| Firmware | C++ (Modular OOP) with Arduino framework |
 | Connectivity | Wi-Fi and MQTT (`PubSubClient`) |
 | Cloud dashboard | ThingsBoard |
 | Tooling | PlatformIO |
@@ -56,15 +56,24 @@ flowchart LR
 
 ## Project Structure
 
+The firmware is designed with a modular, decoupled object-oriented architecture to keep components separated, testable, and clean:
+
 ```text
 .
 ├── firmware/
-│   ├── src/main.cpp                 # PlatformIO firmware entry point
-│   ├── EdgeAI_Predictive_System.ino # Arduino IDE sketch
-│   └── platformio.ini               # ESP32 build configuration
+│   ├── src/
+│   │   ├── main.cpp                 # Application orchestrator & entry point
+│   │   ├── Config.h                 # Global pin, network, and threshold settings
+│   │   ├── SensorManager.h/.cpp     # DHT11/MPU6050 drivers & trend-averaging logic
+│   │   ├── ClassifierManager.h/.cpp # Edge Impulse TinyML inferencing wrapper
+│   │   ├── ActuatorManager.h/.cpp   # Physical LED and Relay output controls
+│   │   └── NetworkManager.h/.cpp    # WiFi management & MQTT (telemetry/RPC callback)
+│   └── platformio.ini               # ESP32 build and library configuration
 ├── model/
-│   └── Prajwal_Navada-project-1_inferencing/
-│       └── src/                    # Exported Edge Impulse model and SDK
+│   └── machine-hawk-inferencing/    # Rebranded Edge Impulse model & SDK library
+│       └── src/
+├── dashboard/
+│   └── dashboard-export.json        # ThingsBoard dashboard configuration export
 ├── docs/                            # Circuit and architecture diagrams
 ├── images/                          # Dashboard and anomaly-detection images
 ├── requirements.txt
@@ -73,7 +82,7 @@ flowchart LR
 
 ## How to Build
 
-### Hardware
+### Hardware Setup
 
 | Component | ESP32 pin | Notes |
 | --- | --- | --- |
@@ -87,13 +96,15 @@ flowchart LR
 
 [![Circuit diagram](docs/circuit-diagram.png)](docs/circuit-diagram.png)
 
-### Firmware
+### Firmware Compilation
 
-1. Clone the repository and open the `firmware` directory in PlatformIO.
-2. Add the exported Edge Impulse library under `model/Prajwal_Navada-project-1_inferencing`, or install it as an Arduino library so `Prajwal_Navada-project-1_inferencing.h` is available to the build.
-3. Install the required libraries: DHT sensor library, Adafruit MPU6050, Adafruit Unified Sensor, PubSubClient, and the Edge Impulse SDK.
-4. In `firmware/src/main.cpp`, set your Wi-Fi SSID, Wi-Fi password, and ThingsBoard device access token. Do not commit real credentials.
-5. Build the project:
+1. Clone the repository and navigate to the `firmware/` directory.
+2. The PlatformIO config (`platformio.ini`) is pre-configured with `lib_extra_dirs = ../model`, meaning PlatformIO will automatically discover the rebranded local TinyML library `machine-hawk-inferencing` without any manual copy steps.
+3. Open `firmware/src/Config.h` and update your Wi-Fi SSID, password, and ThingsBoard credentials:
+   - `WIFI_SSID`
+   - `WIFI_PASSWORD`
+   - `MQTT_TOKEN`
+4. Build the firmware using PlatformIO:
 
    ```bash
    cd firmware
@@ -102,25 +113,25 @@ flowchart LR
 
 ## How to Run
 
-1. Connect the ESP32 over USB.
-2. Upload the firmware:
+1. Connect the ESP32 to your development machine over USB.
+2. Upload the compiled firmware:
 
    ```bash
    cd firmware
    pio run --target upload
    ```
 
-3. Open the serial monitor at 115200 baud:
+3. View console telemetry at 115200 baud:
 
    ```bash
    pio device monitor --baud 115200
    ```
 
-4. Create or open the corresponding ThingsBoard device/dashboard and view the incoming telemetry.
+4. Import `dashboard/dashboard-export.json` into ThingsBoard to display real-time diagnostics.
 
-## Example Usage
+## Example Telemetry
 
-After booting, the ESP32 connects to Wi-Fi and ThingsBoard, then publishes a telemetry payload approximately every 2.5 seconds:
+After booting, the Machine Hawk system starts publishing MQTT telemetry approximately every 2.5 seconds:
 
 ```json
 {
@@ -131,7 +142,7 @@ After booting, the ESP32 connects to Wi-Fi and ThingsBoard, then publishes a tel
 }
 ```
 
-If the TinyML score exceeds the configured threshold, or the current/predicted temperature exceeds its limit, the relay and LED are activated. A ThingsBoard RPC message containing `true` or `false` can also switch the relay remotely.
+If the TinyML classification score exceeds the threshold, or the current/predicted temperature exceeds limits, the local relay and alarm LED trip immediately. Remote overrides are also possible via ThingsBoard RPC commands (`true` / `false` payloads).
 
 [![ThingsBoard dashboard](images/ThingsBoard%20dashboard.png)](images/ThingsBoard%20dashboard.png)
 
@@ -139,9 +150,8 @@ If the TinyML score exceeds the configured threshold, or the current/predicted t
 
 ## Future Improvements
 
-- Move Wi-Fi and cloud credentials into a local configuration file or secure provisioning flow.
 - Add OTA firmware updates and connection-recovery telemetry.
-- Add deep-sleep and power-consumption monitoring for battery deployments.
+- Add deep-sleep and power-consumption optimization for remote battery deployments.
 - Calibrate thresholds and retrain the model with machine-specific data.
 - Add industrial integrations such as Modbus and richer alerting workflows.
 - Explore longer-horizon forecasting models, such as an LSTM, where resources allow.

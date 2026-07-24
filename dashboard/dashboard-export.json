@@ -1,5 +1,5 @@
 {
-  "title": "ESP_predictive Dashboard",
+  "title": "Machine Hawk Dashboard",
   "image": null,
   "mobileHide": false,
   "mobileOrder": null,
@@ -1267,7 +1267,7 @@
     },
     "states": {
       "default": {
-        "name": "ESP_predictive Dashboard",
+        "name": "Machine Hawk Dashboard",
         "root": true,
         "layouts": {
           "main": {
@@ -1339,6 +1339,6 @@
       "toolbarAlwaysOpen": true
     }
   },
-  "name": "ESP_predictive Dashboard",
+  "name": "Machine Hawk Dashboard",
   "resources": []
 }

@@ -1,147 +1,93 @@
-#include <Prajwal_Navada-project-1_inferencing.h>
-#include <Wire.h>
-#include <Adafruit_MPU6050.h>
-#include <Adafruit_Sensor.h>
-#include <DHT.h>
-#include <WiFi.h>
-#include <PubSubClient.h>
+#include <Arduino.h>
+#include "Config.h"
+#include "SensorManager.h"
+#include "ClassifierManager.h"
+#include "ActuatorManager.h"
+#include "NetworkManager.h"
 
-// ================== PINS ==================
-#define DHTPIN 4
-#define DHTTYPE DHT11
+// Instantiate Managers
+SensorManager sensorMgr;
+ClassifierManager classifierMgr;
+ActuatorManager actuatorMgr;
+NetworkManager networkMgr;
 
-const int LED_PIN = 2;
-const int RELAY_PIN = 5;
+unsigned long lastTelemetryTime = 0;
 
-// ================== WiFi & MQTT ==================
-const char* ssid = "YOUR_WIFI_SSID";
-const char* password = "YOUR_WIFI_PASSWORD";
-const char* mqtt_server = "thingsboard.cloud";
-const int mqtt_port = 1883;
-const char* mqtt_token = "lwcqr7074prjvkukkudr";
-
-WiFiClient espClient;
-PubSubClient client(espClient);
-
-DHT dht(DHTPIN, DHTTYPE);
-Adafruit_MPU6050 mpu;
-
-// Moving Average
-const int WINDOW_SIZE = 10;
-float tempHistory[WINDOW_SIZE];
-int historyIndex = 0;
-
-unsigned long lastMsg = 0;
-
-void callback(char* topic, byte* payload, unsigned int length) {
-  String msg;
-  for (unsigned int i = 0; i < length; i++) msg += (char)payload[i];
-  if (msg.indexOf("true") != -1) digitalWrite(RELAY_PIN, LOW);
-  else digitalWrite(RELAY_PIN, HIGH);
+// Callback to handle remote control RPCs from ThingsBoard
+void handleCloudCommand(const String& topic, const String& payload) {
+    Serial.printf("Cloud RPC Received. Topic: %s | Payload: %s\n", topic.c_str(), payload.c_str());
+    
+    // Toggle relay based on RPC payload containing "true" or "false"
+    if (payload.indexOf("true") != -1) {
+        actuatorMgr.setRelayState(true); // Close relay / activate device
+        Serial.println("Relay CLOSED (activated) via remote RPC.");
+    } else {
+        actuatorMgr.setRelayState(false); // Open relay / deactivate device
+        Serial.println("Relay OPENED (deactivated) via remote RPC.");
+    }
 }
 
 void setup() {
-  Serial.begin(115200);
-  pinMode(LED_PIN, OUTPUT);
-  pinMode(RELAY_PIN, OUTPUT);
-  digitalWrite(RELAY_PIN, HIGH);
+    Serial.begin(SERIAL_BAUD_RATE);
+    delay(1000);
+    Serial.println("=== Machine Hawk Predictive Maintenance System Starting ===");
 
-  Wire.begin(21, 22);
-  dht.begin();
-  mpu.begin();
+    // Initialize physical actuators
+    actuatorMgr.begin();
 
-  float initTemp = dht.readTemperature();
-  for(int i=0; i<WINDOW_SIZE; i++) tempHistory[i] = initTemp;
+    // Initialize sensors
+    if (!sensorMgr.begin()) {
+        Serial.println("CRITICAL ERROR: Failed to initialize sensors! System halting.");
+        while (1) {
+            actuatorMgr.setAlarmState(true);
+            delay(200);
+            actuatorMgr.setAlarmState(false);
+            delay(200);
+        }
+    }
 
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500); Serial.print(".");
-  }
-  Serial.println("\nWiFi Connected!");
+    // Initialize Wi-Fi and MQTT Cloud integration
+    networkMgr.begin(handleCloudCommand);
 
-  client.setServer(mqtt_server, mqtt_port);
-  client.setCallback(callback);
-  client.subscribe("v1/devices/me/rpc/request/+");
-
-  Serial.println("=== Full Predictive Edge AI System Ready ===\n");
-}
-
-void reconnect() {
-  while (!client.connected()) {
-    if (client.connect("ESP32_Predictive", mqtt_token, NULL)) {
-      client.subscribe("v1/devices/me/rpc/request/+");
-    } else delay(2000);
-  }
+    Serial.println("=== Machine Hawk System Initialization Complete. Ready! ===\n");
 }
 
 void loop() {
-  if (!client.connected()) reconnect();
-  client.loop();
+    // Process network tasks and keep connection alive
+    networkMgr.loop();
 
-  if (millis() - lastMsg > 2500) {
-    lastMsg = millis();
+    // Perform periodic diagnostics and telemetry reporting
+    if (millis() - lastTelemetryTime >= TELEMETRY_INTERVAL_MS) {
+        lastTelemetryTime = millis();
 
-    float h = dht.readHumidity();
-    float t = dht.readTemperature();
-    sensors_event_t a, g, temp;
-    mpu.getEvent(&a, &g, &temp);
+        // 1. Sample latest environmental & motion metrics
+        sensorMgr.sample();
+        float currentTemp = sensorMgr.getTemperature();
+        float predictedTemp = sensorMgr.getPredictedTemperature();
 
-    // Moving Average + Prediction
-    tempHistory[historyIndex] = t;
-    historyIndex = (historyIndex + 1) % WINDOW_SIZE;
-    float avgTemp = 0;
-    for(int i=0; i<WINDOW_SIZE; i++) avgTemp += tempHistory[i];
-    avgTemp /= WINDOW_SIZE;
+        // 2. Run Edge AI / TinyML anomaly detection
+        float anomalyScore = classifierMgr.runInference(sensorMgr.getDHT(), sensorMgr.getMPU());
 
-    float predictedTemp = t + (t - avgTemp) * 2.0;
+        // 3. Evaluate safety rules & ML decision
+        bool anomalyML = (anomalyScore > ML_ANOMALY_THRESHOLD);
+        bool finalAnomaly = anomalyML || (currentTemp > TEMP_THRESHOLD || predictedTemp > PRED_TEMP_THRESHOLD);
 
-    // ================== TinyML - SAME LOGIC AS YOUR WORKING CODE ==================
-    float buffer[EI_CLASSIFIER_DSP_INPUT_FRAME_SIZE] = {0};
-    Serial.println("Sampling for TinyML...");
+        // 4. Actuate alerts & protection mechanisms
+        actuatorMgr.setAlarmState(finalAnomaly);
+        
+        // If an anomaly is locally triggered, trip the safety isolation relay.
+        // Otherwise, it can remain controlled by remote RPC or default to safe state.
+        if (finalAnomaly) {
+            actuatorMgr.setRelayState(true); // Active-low pin goes LOW, safety trip
+        } else {
+            actuatorMgr.setRelayState(false); // Default safe status
+        }
 
-    for (size_t i = 0; i < EI_CLASSIFIER_DSP_INPUT_FRAME_SIZE; i += EI_CLASSIFIER_RAW_SAMPLES_PER_FRAME) {
-      
-      sensors_event_t a2, g2, temp2;
-      mpu.getEvent(&a2, &g2, &temp2);
-      
-      float t2 = dht.readTemperature();
-      float h2 = dht.readHumidity();
-      float rms = sqrt((a2.acceleration.x*a2.acceleration.x + 
-                        a2.acceleration.y*a2.acceleration.y + 
-                        a2.acceleration.z*a2.acceleration.z) / 3.0);
+        // 5. Console diagnostics
+        Serial.printf("Temp: %.1f°C | Forecast: %.1f°C | ML Anomaly Score: %.2f | State: %s\n", 
+                      currentTemp, predictedTemp, anomalyScore, finalAnomaly ? "ANOMALY DETECTED" : "NORMAL");
 
-      buffer[i]   = t2;
-      buffer[i+1] = h2;
-      buffer[i+2] = a2.acceleration.x;
-      buffer[i+3] = a2.acceleration.y;
-      buffer[i+4] = a2.acceleration.z;
-      buffer[i+5] = rms;
-
-      delayMicroseconds(100000 / EI_CLASSIFIER_FREQUENCY);
+        // 6. Synchronize diagnostics with ThingsBoard
+        networkMgr.publishTelemetry(currentTemp, predictedTemp, anomalyScore, finalAnomaly);
     }
-
-    signal_t signal;
-    numpy::signal_from_buffer(buffer, EI_CLASSIFIER_DSP_INPUT_FRAME_SIZE, &signal);
-    ei_impulse_result_t result = {0};
-    run_classifier(&signal, &result, false);
-
-    // Decision
-    bool anomaly_ml = (result.anomaly > 75);
-
-    bool final_anomaly = anomaly_ml || (t > 32.5 || predictedTemp > 34.0);
-
-    digitalWrite(RELAY_PIN, final_anomaly ? LOW : HIGH);
-    digitalWrite(LED_PIN, final_anomaly);
-
-    Serial.printf("Temp: %.1f | Pred: %.1f | AnomalyScore: %.2f | %s\n", 
-                  t, predictedTemp, result.anomaly, final_anomaly ? "ANOMALY" : "Normal");
-
-    // Send to Cloud
-    char msg[400];
-    snprintf(msg, sizeof(msg),
-      "{\"temperature\":%.1f,\"predicted_temp\":%.1f,\"anomaly_score\":%.2f,\"anomaly\":%s}",
-      t, predictedTemp, result.anomaly, final_anomaly ? "true" : "false");
-
-    client.publish("v1/devices/me/telemetry", msg);
-  }
 }
