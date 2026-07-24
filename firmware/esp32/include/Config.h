@@ -2,6 +2,7 @@
 #define CONFIG_H
 
 #include <Arduino.h>
+#include <DHT.h>
 
 // ================== Hardware Pins ==================
 #define DHTPIN 4
@@ -17,8 +18,8 @@ const int I2C_SCL_PIN = 22;
 const int WINDOW_SIZE = 10;
 
 // ================== Network Configuration ==================
-const char* const WIFI_SSID = "YOUR_WIFI_SSID";
-const char* const WIFI_PASSWORD = "YOUR_WIFI_PASSWORD";
+const char* const WIFI_SSID = "TP-Link_9240";
+const char* const WIFI_PASSWORD = "Act@2026";
 
 const char* const MQTT_SERVER = "thingsboard.cloud";
 const int MQTT_PORT = 1883;
