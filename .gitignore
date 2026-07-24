@@ -1,1 +1,56 @@
+# IDE / VS Code configuration
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# OS Files
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+ehthumbs.db
+
+# PlatformIO / C++ Build Files
+.pio/
+.pioenvs/
+.piolibdeps/
+.clang_complete
+.gcc-flags.json
+*.elf
+*.bin
+*.hex
+*.map
+*.o
+*.d
+*.a
+*.ko
+*.so
+*.dylib
+
+# Python Backend / Caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+env/
+.env
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Node.js / Web Frontend
+node_modules/
+dist/
+build/
+.npm
+.eslintcache
+*.log
+
+# Project-specific
 Q&A.md
