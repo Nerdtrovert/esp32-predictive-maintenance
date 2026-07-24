@@ -133,7 +133,7 @@
  /Users/prajwalnavadagp/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32/include/esp_hw_support/include/soc/esp32/spiram.h \
  /Users/prajwalnavadagp/.platformio/packages/framework-arduinoespressif32/cores/esp32/io_pin_remap.h \
  /Users/prajwalnavadagp/.platformio/packages/framework-arduinoespressif32/cores/esp32/Arduino.h \
- src/Config.h src/SensorManager.h \
+ include/Config.h include/SensorManager.h \
  .pio/libdeps/esp32dev/Adafruit\ MPU6050/Adafruit_MPU6050.h \
  .pio/libdeps/esp32dev/Adafruit\ BusIO/Adafruit_BusIO_Register.h \
  .pio/libdeps/esp32dev/Adafruit\ BusIO/Adafruit_GenericDevice.h \
@@ -145,8 +145,9 @@
  /Users/prajwalnavadagp/.platformio/packages/framework-arduinoespressif32/cores/esp32/esp32-hal-spi.h \
  .pio/libdeps/esp32dev/Adafruit\ Unified\ Sensor/Adafruit_Sensor.h \
  /Users/prajwalnavadagp/.platformio/packages/framework-arduinoespressif32/cores/esp32/Print.h \
- .pio/libdeps/esp32dev/DHT\ sensor\ library/DHT.h src/ClassifierManager.h \
- src/ActuatorManager.h src/NetworkManager.h \
+ .pio/libdeps/esp32dev/DHT\ sensor\ library/DHT.h include/Config.h \
+ include/ClassifierManager.h include/ActuatorManager.h \
+ include/NetworkManager.h \
  /Users/prajwalnavadagp/.platformio/packages/framework-arduinoespressif32/libraries/WiFi/src/WiFi.h \
  /Users/prajwalnavadagp/.platformio/packages/framework-arduinoespressif32/cores/esp32/IPv6Address.h \
  /Users/prajwalnavadagp/.platformio/packages/framework-arduinoespressif32/libraries/WiFi/src/WiFiType.h \

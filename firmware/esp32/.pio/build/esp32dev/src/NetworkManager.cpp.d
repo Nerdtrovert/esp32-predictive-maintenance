@@ -1,5 +1,5 @@
 .pio/build/esp32dev/src/NetworkManager.cpp.o: src/NetworkManager.cpp \
- src/NetworkManager.h \
+ include/NetworkManager.h \
  /Users/prajwalnavadagp/.platformio/packages/framework-arduinoespressif32/libraries/WiFi/src/WiFi.h \
  /Users/prajwalnavadagp/.platformio/packages/framework-arduinoespressif32/cores/esp32/Print.h \
  /Users/prajwalnavadagp/.platformio/packages/framework-arduinoespressif32/cores/esp32/WString.h \
@@ -195,4 +195,4 @@
  /Users/prajwalnavadagp/.platformio/packages/framework-arduinoespressif32/libraries/WiFi/src/WiFiUdp.h \
  /Users/prajwalnavadagp/.platformio/packages/framework-arduinoespressif32/cores/esp32/Udp.h \
  /Users/prajwalnavadagp/.platformio/packages/framework-arduinoespressif32/cores/esp32/cbuf.h \
- .pio/libdeps/esp32dev/PubSubClient/src/PubSubClient.h src/Config.h
+ .pio/libdeps/esp32dev/PubSubClient/src/PubSubClient.h include/Config.h

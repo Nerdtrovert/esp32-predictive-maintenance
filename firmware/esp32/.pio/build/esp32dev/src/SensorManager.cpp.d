@@ -1,5 +1,5 @@
 .pio/build/esp32dev/src/SensorManager.cpp.o: src/SensorManager.cpp \
- src/SensorManager.h \
+ include/SensorManager.h \
  .pio/libdeps/esp32dev/Adafruit\ MPU6050/Adafruit_MPU6050.h \
  /Users/prajwalnavadagp/.platformio/packages/framework-arduinoespressif32/cores/esp32/Arduino.h \
  /Users/prajwalnavadagp/.platformio/packages/framework-arduinoespressif32/cores/esp32/esp_arduino_version.h \
@@ -145,4 +145,4 @@
  /Users/prajwalnavadagp/.platformio/packages/framework-arduinoespressif32/cores/esp32/esp32-hal-spi.h \
  .pio/libdeps/esp32dev/Adafruit\ Unified\ Sensor/Adafruit_Sensor.h \
  /Users/prajwalnavadagp/.platformio/packages/framework-arduinoespressif32/cores/esp32/Print.h \
- .pio/libdeps/esp32dev/DHT\ sensor\ library/DHT.h src/Config.h
+ .pio/libdeps/esp32dev/DHT\ sensor\ library/DHT.h include/Config.h

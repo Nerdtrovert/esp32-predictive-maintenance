@@ -1,5 +1,5 @@
 .pio/build/esp32dev/src/ClassifierManager.cpp.o: \
- src/ClassifierManager.cpp src/ClassifierManager.h \
+ src/ClassifierManager.cpp include/ClassifierManager.h \
  .pio/libdeps/esp32dev/Adafruit\ MPU6050/Adafruit_MPU6050.h \
  /Users/prajwalnavadagp/.platformio/packages/framework-arduinoespressif32/cores/esp32/Arduino.h \
  /Users/prajwalnavadagp/.platformio/packages/framework-arduinoespressif32/cores/esp32/esp_arduino_version.h \
