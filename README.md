@@ -185,3 +185,15 @@ If the TinyML classification score exceeds the threshold, or the current/predict
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
+
+
+  To make pio run --target upload work out-of-the-box on Ubuntu, configure your user permissions first:
+
+  1. Add your user to the dialout group (grants serial port access):
+    sudo usermod -a -G dialout $USER
+    (Note: You will need to log out of Ubuntu and log back in for this to take effect).
+  2. Install PlatformIO's udev rules (helps identify and set permissions for all USB microcontrollers):
+    curl -fsSL https://raw.githubusercontent.com/platformio/platformio-core/master/platformio/assets/system/99-platformio-udev.rules | sudo
+  tee /etc/udev/rules.d/99-platformio-udev.rules
+    sudo udevadm control --reload-rules
+    sudo udevadm trigger
