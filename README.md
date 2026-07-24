@@ -1,5 +1,9 @@
 # Machine Hawk Predictive Maintenance System
 
+<p align="center">
+  <img src="assets/logo.png" alt="Machine Hawk Logo" width="150" />
+</p>
+
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
 ![ESP32](https://img.shields.io/badge/ESP32-Enabled-blue)
 ![TinyML](https://img.shields.io/badge/TinyML-Deployed-orange)
