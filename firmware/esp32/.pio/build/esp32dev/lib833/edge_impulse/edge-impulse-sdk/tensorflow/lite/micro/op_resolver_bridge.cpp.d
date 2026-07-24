@@ -1,0 +1,29 @@
+.pio/build/esp32dev/lib833/edge_impulse/edge-impulse-sdk/tensorflow/lite/micro/op_resolver_bridge.cpp.o: \
+ edge_impulse/src/edge-impulse-sdk/tensorflow/lite/micro/op_resolver_bridge.cpp \
+ edge_impulse/src/edge-impulse-sdk/tensorflow/lite/micro/op_resolver_bridge.h \
+ edge_impulse/src/edge-impulse-sdk/tensorflow/lite/c/c_api_types.h \
+ edge_impulse/src/edge-impulse-sdk/tensorflow/lite/core/c/c_api_types.h \
+ edge_impulse/src/edge-impulse-sdk/tensorflow/lite/c/common.h \
+ edge_impulse/src/edge-impulse-sdk/tensorflow/lite/core/c/common.h \
+ edge_impulse/src/edge-impulse-sdk/tensorflow/lite/core/api/op_resolver.h \
+ edge_impulse/src/edge-impulse-sdk/tensorflow/lite/core/api/error_reporter.h \
+ edge_impulse/src/edge-impulse-sdk/tensorflow/lite/schema/schema_generated.h \
+ edge_impulse/src/edge-impulse-sdk/third_party/flatbuffers/include/flatbuffers/flatbuffers.h \
+ edge_impulse/src/edge-impulse-sdk/third_party/flatbuffers/include/flatbuffers/fb_array.h \
+ edge_impulse/src/edge-impulse-sdk/third_party/flatbuffers/include/flatbuffers/fb_base.h \
+ edge_impulse/src/edge-impulse-sdk/third_party/flatbuffers/include/flatbuffers/fb_stl_emulation.h \
+ edge_impulse/src/edge-impulse-sdk/third_party/flatbuffers/include/flatbuffers/fb_vector.h \
+ edge_impulse/src/edge-impulse-sdk/third_party/flatbuffers/include/flatbuffers/fb_buffer.h \
+ edge_impulse/src/edge-impulse-sdk/third_party/flatbuffers/include/flatbuffers/fb_buffer_ref.h \
+ edge_impulse/src/edge-impulse-sdk/third_party/flatbuffers/include/flatbuffers/fb_verifier.h \
+ edge_impulse/src/edge-impulse-sdk/third_party/flatbuffers/include/flatbuffers/fb_detached_buffer.h \
+ edge_impulse/src/edge-impulse-sdk/third_party/flatbuffers/include/flatbuffers/fb_allocator.h \
+ edge_impulse/src/edge-impulse-sdk/third_party/flatbuffers/include/flatbuffers/fb_default_allocator.h \
+ edge_impulse/src/edge-impulse-sdk/third_party/flatbuffers/include/flatbuffers/fb_flatbuffer_builder.h \
+ edge_impulse/src/edge-impulse-sdk/third_party/flatbuffers/include/flatbuffers/fb_string.h \
+ edge_impulse/src/edge-impulse-sdk/third_party/flatbuffers/include/flatbuffers/fb_struct.h \
+ edge_impulse/src/edge-impulse-sdk/third_party/flatbuffers/include/flatbuffers/fb_table.h \
+ edge_impulse/src/edge-impulse-sdk/third_party/flatbuffers/include/flatbuffers/fb_vector_downward.h \
+ edge_impulse/src/edge-impulse-sdk/tensorflow/lite/micro/micro_error_reporter.h \
+ edge_impulse/src/edge-impulse-sdk/tensorflow/lite/micro/compatibility.h \
+ edge_impulse/src/edge-impulse-sdk/tensorflow/lite/schema/schema_utils.h

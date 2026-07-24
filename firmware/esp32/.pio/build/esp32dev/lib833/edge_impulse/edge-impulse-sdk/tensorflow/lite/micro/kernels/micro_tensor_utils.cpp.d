@@ -1,0 +1,20 @@
+.pio/build/esp32dev/lib833/edge_impulse/edge-impulse-sdk/tensorflow/lite/micro/kernels/micro_tensor_utils.cpp.o: \
+ edge_impulse/src/edge-impulse-sdk/tensorflow/lite/micro/kernels/micro_tensor_utils.cpp \
+ edge_impulse/src/edge-impulse-sdk/tensorflow/lite/micro/kernels/micro_tensor_utils.h \
+ edge_impulse/src/edge-impulse-sdk/tensorflow/lite/c/builtin_op_data.h \
+ edge_impulse/src/edge-impulse-sdk/tensorflow/lite/core/c/builtin_op_data.h \
+ edge_impulse/src/edge-impulse-sdk/tensorflow/lite/core/c/common.h \
+ edge_impulse/src/edge-impulse-sdk/tensorflow/lite/core/c/c_api_types.h \
+ edge_impulse/src/edge-impulse-sdk/tensorflow/lite/c/common.h \
+ edge_impulse/src/edge-impulse-sdk/tensorflow/lite/kernels/internal/portable_tensor_utils.h \
+ edge_impulse/src/edge-impulse-sdk/third_party/gemmlowp/fixedpoint/fixedpoint.h \
+ edge_impulse/src/edge-impulse-sdk/third_party/gemmlowp/fixedpoint/../internal/detect_platform.h \
+ edge_impulse/src/edge-impulse-sdk/tensorflow/lite/kernels/internal/common.h \
+ edge_impulse/src/edge-impulse-sdk/tensorflow/lite/kernels/internal/cppmath.h \
+ edge_impulse/src/edge-impulse-sdk/tensorflow/lite/kernels/internal/optimized/neon_check.h \
+ edge_impulse/src/edge-impulse-sdk/tensorflow/lite/kernels/internal/types.h \
+ edge_impulse/src/edge-impulse-sdk/tensorflow/lite/kernels/internal/compatibility.h \
+ edge_impulse/src/edge-impulse-sdk/tensorflow/lite/portable_type_to_tflitetype.h \
+ edge_impulse/src/edge-impulse-sdk/tensorflow/lite/kernels/op_macros.h \
+ edge_impulse/src/edge-impulse-sdk/tensorflow/lite/micro/debug_log.h \
+ edge_impulse/src/edge-impulse-sdk/tensorflow/lite/kernels/internal/runtime_shape.h

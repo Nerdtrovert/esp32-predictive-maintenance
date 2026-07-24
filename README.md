@@ -56,28 +56,45 @@ flowchart LR
 
 ## Project Structure
 
-The firmware is designed with a modular, decoupled object-oriented architecture to keep components separated, testable, and clean:
+The project layout follows a structured, clean monorepo organization:
 
 ```text
-.
+Machine-Hawk/
+├── README.md
+├── LICENSE
+├── docs/
+│   ├── architecture.png
+│   ├── workflow.png
+│   ├── presentation.pdf
+│   └── demo-images/                 # Circuit connections & diagrams
 ├── firmware/
-│   ├── src/
-│   │   ├── main.cpp                 # Application orchestrator & entry point
-│   │   ├── Config.h                 # Global pin, network, and threshold settings
-│   │   ├── SensorManager.h/.cpp     # DHT11/MPU6050 drivers & trend-averaging logic
-│   │   ├── ClassifierManager.h/.cpp # Edge Impulse TinyML inferencing wrapper
-│   │   ├── ActuatorManager.h/.cpp   # Physical LED and Relay output controls
-│   │   └── NetworkManager.h/.cpp    # WiFi management & MQTT (telemetry/RPC callback)
-│   └── platformio.ini               # ESP32 build and library configuration
-├── model/
-│   └── machine-hawk-inferencing/    # Rebranded Edge Impulse model & SDK library
-│       └── src/
-├── dashboard/
-│   └── dashboard-export.json        # ThingsBoard dashboard configuration export
-├── docs/                            # Circuit and architecture diagrams
-├── images/                          # Dashboard and anomaly-detection images
-├── requirements.txt
-└── README.md
+│   └── esp32/
+│       ├── src/                     # Modular OOP C++ sources (main.cpp, Config.h, managers)
+│       ├── include/                 # Custom headers
+│       ├── edge_impulse/            # Local rebranded Edge Impulse TinyML inference library
+│       └── platformio.ini           # ESP32 platform build configuration
+├── backend/
+│   ├── app.py                       # Python app server
+│   ├── mqtt_handler.py              # MQTT message transceiver
+│   ├── health_engine.py             # Predictive diagnostics calculations
+│   ├── recommendation_engine.py     # Maintenance recommendation generator
+│   └── requirements.txt             # Python dependencies
+├── web/
+│   ├── src/                         # Frontend sources
+│   ├── public/                      # Static assets
+│   ├── package.json                 # Frontend dependencies configuration
+│   └── README.md                    # Frontend documentation
+├── ai/
+│   ├── edge_impulse_model/          # TinyML model design configurations
+│   ├── linear_regression/           # Reference regression models
+│   └── notebooks/                   # Jupyter notebooks for model validation
+├── data/
+│   ├── sample_data.csv              # Small sample dataset for local tests
+│   └── demo_dataset.csv             # Full verification dataset
+└── assets/
+    ├── logo.png                     # Machine Hawk logo
+    ├── screenshots/                 # Application screenshots & UI demos
+    └── demo_video.mp4               # Full functional demonstration video
 ```
 
 ## How to Build
@@ -92,22 +109,22 @@ The firmware is designed with a modular, decoupled object-oriented architecture 
 | Relay module | GPIO 5 | Active-low appliance control |
 | Status LED | GPIO 2 | Visual alert |
 
-[![Circuit Connections](docs/circuit-connections.jpg)](docs/circuit-connections.jpg)
+[![Circuit Connections](docs/demo-images/circuit-connections.jpg)](docs/demo-images/circuit-connections.jpg)
 
-[![Circuit diagram](docs/circuit-diagram.png)](docs/circuit-diagram.png)
+[![Circuit diagram](docs/demo-images/circuit-diagram.png)](docs/demo-images/circuit-diagram.png)
 
 ### Firmware Compilation
 
-1. Clone the repository and navigate to the `firmware/` directory.
-2. The PlatformIO config (`platformio.ini`) is pre-configured with `lib_extra_dirs = ../model`, meaning PlatformIO will automatically discover the rebranded local TinyML library `machine-hawk-inferencing` without any manual copy steps.
-3. Open `firmware/src/Config.h` and update your Wi-Fi SSID, password, and ThingsBoard credentials:
+1. Clone the repository and navigate to the `firmware/esp32/` directory.
+2. The PlatformIO config (`platformio.ini`) is pre-configured with `lib_extra_dirs = edge_impulse`, meaning PlatformIO will automatically discover the rebranded local TinyML library `machine-hawk-inferencing` without any manual copy steps.
+3. Open `firmware/esp32/src/Config.h` and update your Wi-Fi SSID, password, and ThingsBoard credentials:
    - `WIFI_SSID`
    - `WIFI_PASSWORD`
    - `MQTT_TOKEN`
 4. Build the firmware using PlatformIO:
 
    ```bash
-   cd firmware
+   cd firmware/esp32
    pio run
    ```
 
@@ -117,7 +134,7 @@ The firmware is designed with a modular, decoupled object-oriented architecture 
 2. Upload the compiled firmware:
 
    ```bash
-   cd firmware
+   cd firmware/esp32
    pio run --target upload
    ```
 
@@ -144,9 +161,9 @@ After booting, the Machine Hawk system starts publishing MQTT telemetry approxim
 
 If the TinyML classification score exceeds the threshold, or the current/predicted temperature exceeds limits, the local relay and alarm LED trip immediately. Remote overrides are also possible via ThingsBoard RPC commands (`true` / `false` payloads).
 
-[![ThingsBoard dashboard](images/ThingsBoard%20dashboard.png)](images/ThingsBoard%20dashboard.png)
+[![ThingsBoard dashboard](assets/screenshots/ThingsBoard%20dashboard.png)](assets/screenshots/ThingsBoard%20dashboard.png)
 
-[![Anomaly detection](images/anomaly-detection.jpg)](images/anomaly-detection.jpg)
+[![Anomaly detection](assets/screenshots/anomaly-detection.jpg)](assets/screenshots/anomaly-detection.jpg)
 
 ## Future Improvements
 
