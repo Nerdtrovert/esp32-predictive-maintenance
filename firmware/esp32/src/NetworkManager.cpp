@@ -1,5 +1,6 @@
 #include "NetworkManager.h"
 #include "Config.h"
+#include <cstring>
 
 NetworkManager* NetworkManager::instance = nullptr;
 
@@ -33,10 +34,18 @@ void NetworkManager::reconnectMQTT() {
     while (!mqttClient.connected()) {
         connectWiFi();
         
-        Serial.print("Attempting MQTT connection to ThingsBoard...");
-        if (mqttClient.connect(MQTT_CLIENT_ID, MQTT_TOKEN, nullptr)) {
+        Serial.print("Attempting MQTT connection...");
+        bool connected = false;
+        if (std::strlen(MQTT_USERNAME) > 0) {
+            const char* passwordPtr = std::strlen(MQTT_PASSWORD) > 0 ? MQTT_PASSWORD : nullptr;
+            connected = mqttClient.connect(MQTT_CLIENT_ID, MQTT_USERNAME, passwordPtr);
+        } else {
+            connected = mqttClient.connect(MQTT_CLIENT_ID);
+        }
+
+        if (connected) {
             Serial.println("connected");
-            mqttClient.subscribe("v1/devices/me/rpc/request/+");
+            mqttClient.subscribe(MQTT_RPC_TOPIC);
         } else {
             Serial.print("failed, rc=");
             Serial.print(mqttClient.state());
@@ -68,7 +77,7 @@ bool NetworkManager::publishTelemetry(float temp, float predTemp, float anomalyS
     Serial.print("Publishing telemetry: ");
     Serial.println(payload);
     
-    return mqttClient.publish("v1/devices/me/telemetry", payload);
+    return mqttClient.publish(MQTT_TELEMETRY_TOPIC, payload);
 }
 
 void NetworkManager::mqttCallback(char* topic, byte* payload, unsigned int length) {

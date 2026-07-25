@@ -1,5 +1,4 @@
 # IDE / VS Code configuration
-.vscode/
 .idea/
 *.suo
 *.ntvs*
@@ -54,3 +53,5 @@ build/
 
 # Project-specific
 Q&A.md
+
+/.claude

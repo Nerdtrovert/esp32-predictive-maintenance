@@ -21,10 +21,14 @@ const int WINDOW_SIZE = 10;
 const char* const WIFI_SSID = "TP-Link_9240";
 const char* const WIFI_PASSWORD = "Act@2026";
 
-const char* const MQTT_SERVER = "thingsboard.cloud";
+// Set MQTT_SERVER to your broker host/IP reachable by ESP32 and backend.
+const char* const MQTT_SERVER = "broker.hivemq.com";
 const int MQTT_PORT = 1883;
-const char* const MQTT_TOKEN = "lwcqr7074prjvkukkudr";
+const char* const MQTT_USERNAME = "";
+const char* const MQTT_PASSWORD = "";
 const char* const MQTT_CLIENT_ID = "Machine_Hawk_Predictive";
+const char* const MQTT_TELEMETRY_TOPIC = "machine-hawk/telemetry/1";
+const char* const MQTT_RPC_TOPIC = "machine-hawk/rpc/1";
 
 // Telemetry & Intervals
 const unsigned long TELEMETRY_INTERVAL_MS = 2500;

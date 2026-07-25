@@ -202,3 +202,30 @@ This project is licensed under the [MIT License](LICENSE).
   tee /etc/udev/rules.d/99-platformio-udev.rules
     sudo udevadm control --reload-rules
     sudo udevadm trigger
+
+
+
+
+  ⚙️  How to Run
+
+  1. Backend:
+  cd backend
+  pip install -r requirements.txt
+  # Optional MQTT broker overrides for backend subscriber:
+  # export MQTT_BROKER_HOST=broker.hivemq.com
+  # export MQTT_BROKER_PORT=1883
+  # export MQTT_TOPIC_FILTER=machine-hawk/telemetry/+
+  python app.py
+  API will be available at http://localhost:8000
+
+  2. Frontend:
+  cd web
+  npm install  # if not already done
+  npm run dev
+  Frontend uses `/api` proxy to backend by default.
+  Optional override: set `VITE_API_URL` (example: `VITE_API_URL=http://localhost:8000`).
+
+  3. MQTT wiring:
+  - ESP32 publishes telemetry to `machine-hawk/telemetry/1`
+  - Backend subscribes to `machine-hawk/telemetry/+`
+  - Verify bridge health at `GET /api/mqtt/status`
