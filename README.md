@@ -171,6 +171,7 @@ If the TinyML classification score exceeds the threshold, or the current/predict
 
 ## Future Improvements
 
+- **Gas/Smoke Hazard Detection**: Integrate an MQ-2 gas/smoke sensor for hybrid safety alerts (monitoring electrical faults, arcing, and wiring overheating alongside the TinyML mechanical vibration analysis).
 - Add OTA firmware updates and connection-recovery telemetry.
 - Add deep-sleep and power-consumption optimization for remote battery deployments.
 - Calibrate thresholds and retrain the model with machine-specific data.
