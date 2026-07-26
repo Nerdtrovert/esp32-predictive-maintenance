@@ -9,7 +9,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
       <div className="flex-1 flex flex-col">
         <Navbar />
         <main className="flex-1 p-6 overflow-auto">
-          <Outlet />
+          {children}
         </main>
       </div>
     </div>

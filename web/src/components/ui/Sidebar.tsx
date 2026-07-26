@@ -2,7 +2,8 @@ import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard,
   Settings,
-  Analytics,
+  TrendingUp,
+  Cpu,
   Bell,
   Wrench,
   FileText
@@ -43,7 +44,7 @@ export const Sidebar = () => {
               ${isActive ? 'bg-primary/10 text-primary' : 'hover:bg-accent/5 text-foreground/80 hover:text-foreground'}
             `}
           >
-            <Settings className="mr-3 h-4 w-4" />
+            <Cpu className="mr-3 h-4 w-4" />
             Machines
           </NavLink>
 
@@ -55,7 +56,7 @@ export const Sidebar = () => {
               ${isActive ? 'bg-primary/10 text-primary' : 'hover:bg-accent/5 text-foreground/80 hover:text-foreground'}
             `}
           >
-            <Analytics className="mr-3 h-4 w-4" />
+            <TrendingUp className="mr-3 h-4 w-4" />
             AI Insights
           </NavLink>
 
@@ -86,8 +87,7 @@ export const Sidebar = () => {
           <NavLink
             to="/reports"
             end
-            className={( {isActive ? 'bg-primary/10 text-primary' : 'hover:bg-accent/5 text-foreground/80 hover:text-foreground'}
-            `}
+            className={({ isActive }) => (isActive ? 'bg-primary/10 text-primary' : 'hover:bg-accent/5 text-foreground/80 hover:text-foreground')}
           >
             <FileText className="mr-3 h-4 w-4" />
             Reports

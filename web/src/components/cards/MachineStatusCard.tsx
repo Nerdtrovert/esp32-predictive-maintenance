@@ -1,7 +1,7 @@
 import React from 'react';
 import { 
   Circle, 
-  TriangleAlert, 
+  AlertTriangle, 
   XCircle,
   Thermometer,
   Activity,
@@ -36,7 +36,7 @@ export const MachineStatusCard = ({
         };
       case 'warning':
         return {
-          icon: TriangleAlert,
+          icon: AlertTriangle,
           color: 'text-warning',
           bg: 'bg-warning/5',
           label: 'Warning'
@@ -87,7 +87,7 @@ export const MachineStatusCard = ({
       
       <div className="h-2 bg-muted/5 rounded-full mt-3 overflow-hidden">
         <div 
-          className={`${bg} h-full transition-all duration-500`} 
+          className={`${color.replace('text-', 'bg-')} h-full transition-all duration-500`} 
           style={{ width: `${health}%` }}
         ></div>
       </div>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
-import { FileText, BarChart3, ClipboardList, PieChart, Zap, Truck, Loader2, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { FileText, BarChart3, ClipboardList, PieChart, Zap, Truck, Loader2, CheckCircle2, AlertTriangle, Gauge, Activity, Square, Clock } from 'lucide-react';
 import apiService from '@/services/apiService';
 
 interface ReportViewerProps {
@@ -292,7 +292,7 @@ export const ReportViewer = ({ reportId, onReportNotFound }: ReportViewerProps) 
           <h3 className="text-lg font-semibold flex items-center space-x-2">
             <CheckCircle2 className="h-4 w-4 text-industrial-accent" />
             Executive Summary
-          </div>
+          </h3>
           <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
             {reportData.data.summary}
           </p>
@@ -304,15 +304,15 @@ export const ReportViewer = ({ reportId, onReportNotFound }: ReportViewerProps) 
             <h3 className="text-lg font-semibold flex items-center space-x-2">
               <BarChart3 className="h-4 w-4 text-industrial-accent" />
               Key Metrics
-            </div>
+            </h3>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               {reportData.data.metrics.map((metric: any, index: number) => (
                 <div key={index} className="p-4 rounded-lg border border-border/50 hover:bg-accent/5 transition-colors">
                   <div className="flex items-center space-x-3">
-                    <div className="flex-shrink-0 h-8 w-8 bg-industrial-accent/10 rounded-flex items-center justify-center">
+                    <div className="flex-shrink-0 h-8 w-8 bg-industrial-accent/10 rounded-full flex items-center justify-center">
                       {/* Icons based on metric type */}
                       {metric.label.toLowerCase().includes('units') && (
-                        <Box className="h-4 w-4 text-industrial-accent" />
+                        <Square className="h-4 w-4 text-industrial-accent" />
                       )}
                       {metric.label.toLowerCase().includes('rate') && (
                         <AlertTriangle className="h-4 w-4 text-industrial-warning" />
@@ -328,20 +328,22 @@ export const ReportViewer = ({ reportId, onReportNotFound }: ReportViewerProps) 
                       <p className="font-medium text-sm">{metric.label}</p>
                       <p className="text-2xl font-bold">
                         {metric.value}
-                        <span className={`ml-1 text-xs ${
-                          metric.trend === 'up'
-                            ? 'text-industrial-success'
-                            : metric.trend === 'down'
-                              ? 'text-industrial-danger'
-                              : 'text-industrial-secondary'
-                        }`}>
+                        <span className={
+                          `ml-1 text-xs ${
+                            metric.trend === 'up'
+                              ? 'text-industrial-success'
+                              : metric.trend === 'down'
+                                ? 'text-industrial-danger'
+                                : 'text-industrial-secondary'
+                          }`}
+                        >
                           {metric.change}
                         </span>
                       </p>
                     </div>
                   </div>
                 </div>
-              )}
+              ))}
             </div>
           </div>
         )}
@@ -352,7 +354,7 @@ export const ReportViewer = ({ reportId, onReportNotFound }: ReportViewerProps) 
             <h3 className="text-lg font-semibold flex items-center space-x-2">
               <BarChart3 className="h-4 w-4 text-industrial-accent" />
               Production by Line
-            </div>
+            </h3>
             <div className="space-y-3">
               {reportData.data.production_by_line.map((line: any, index: number) => (
                 <div key={index} className="p-4 rounded-lg border border-border/50 hover:bg-accent/5 transition-colors">
@@ -363,13 +365,15 @@ export const ReportViewer = ({ reportId, onReportNotFound }: ReportViewerProps) 
                     </div>
                     <div className="text-right space-y-1">
                       <p className="text-lg font-semibold">{line.units.toLocaleString()}</p>
-                      <p className={`text-xs ${
-                        line.efficiency >= 90
-                          ? 'text-industrial-success'
-                          : line.efficiency >= 75
-                            ? 'text-industrial-warning'
-                            : 'text-industrial-danger'
-                      }`}>
+                      <p className={
+                        `text-xs ${
+                          line.efficiency >= 90
+                            ? 'text-industrial-success'
+                            : line.efficiency >= 75
+                              ? 'text-industrial-warning'
+                              : 'text-industrial-danger'
+                        }`}
+                      >
                         {line.efficiency}% Efficiency
                       </p>
                     </div>
@@ -386,7 +390,7 @@ export const ReportViewer = ({ reportId, onReportNotFound }: ReportViewerProps) 
             <h3 className="text-lg font-semibold flex items-center space-x-2">
               <PieChart className="h-4 w-4 text-industrial-warning" />
               Quality Metrics
-            </div>
+            </h3>
             <div className="space-y-3">
               {reportData.data.quality_metrics.map((metric: any, index: number) => (
                 <div key={index} className="flex items-center justify-between p-3 rounded-lg border border-border/50 hover:bg-accent/5">
@@ -395,11 +399,13 @@ export const ReportViewer = ({ reportId, onReportNotFound }: ReportViewerProps) 
                     <p className="text-xs text-muted-foreground">Target: {metric.target}</p>
                   </div>
                   <div className="text-right">
-                    <p className={`text-lg font-semibold ${
-                      parseFloat(metric.value.replace('%', '')) >= parseFloat(metric.target.replace('%', ''))
-                        ? 'text-industrial-success'
-                        : 'text-industrial-warning'
-                    }`}>
+                    <p className={
+                      `text-lg font-semibold ${
+                        parseFloat(metric.value.replace('%', '')) >= parseFloat(metric.target.replace('%', ''))
+                          ? 'text-industrial-success'
+                          : 'text-industrial-warning'
+                      }`}
+                    >
                       {metric.value}
                     </p>
                   </div>
@@ -415,7 +421,7 @@ export const ReportViewer = ({ reportId, onReportNotFound }: ReportViewerProps) 
             <h3 className="text-lg font-semibold flex items-center space-x-2">
               <ClipboardList className="h-4 w-4 text-industrial-success" />
               Machine Details
-            </div>
+            </h3>
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-border/50">
                 <thead className="bg-industrial-blue/5">
@@ -434,35 +440,41 @@ export const ReportViewer = ({ reportId, onReportNotFound }: ReportViewerProps) 
                     <tr key={index} className="hover:bg-accent/5">
                       <td className="text-sm px-4 py-3">{machine.machine}</td>
                       <td className="text-sm px-4 py-3">
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                          machine.availability >= 90
-                            ? 'bg-industrial-success/10 text-industrial-success'
-                            : machine.availability >= 75
-                              ? 'bg-industrial-warning/10 text-industrial-warning'
-                              : 'bg-industrial-danger/10 text-industrial-danger'
-                        }`}>
+                        <span className={
+                          `px-2 py-0.5 rounded-full text-xs font-medium ${
+                            machine.availability >= 90
+                              ? 'bg-industrial-success/10 text-industrial-success'
+                              : machine.availability >= 75
+                                ? 'bg-industrial-warning/10 text-industrial-warning'
+                                : 'bg-industrial-danger/10 text-industrial-danger'
+                          }`}
+                        >
                           {machine.availability}%
                         </span>
                       </td>
                       <td className="text-sm px-4 py-3">
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                          machine.performance >= 90
-                            ? 'bg-industrial-success/10 text-industrial-success'
-                            : machine.performance >= 75
-                              ? 'bg-industrial-warning/10 text-industrial-warning'
-                              : 'bg-industrial-danger/10 text-industrial-danger'
-                        }`}>
+                        <span className={
+                          `px-2 py-0.5 rounded-full text-xs font-medium ${
+                            machine.performance >= 90
+                              ? 'bg-industrial-success/10 text-industrial-success'
+                              : machine.performance >= 75
+                                ? 'bg-industrial-warning/10 text-industrial-warning'
+                                : 'bg-industrial-danger/10 text-industrial-danger'
+                          }`}
+                        >
                           {machine.performance}%
                         </span>
                       </td>
                       <td className="text-sm px-4 py-3">
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                          machine.quality >= 90
-                            ? 'bg-industrial-success/10 text-industrial-success'
-                            : machine.quality >= 75
-                              ? 'bg-industrial-warning/10 text-industrial-warning'
-                              : 'bg-industrial-danger/10 text-industrial-danger'
-                        }`}>
+                        <span className={
+                          `px-2 py-0.5 rounded-full text-xs font-medium ${
+                            machine.quality >= 90
+                              ? 'bg-industrial-success/10 text-industrial-success'
+                              : machine.quality >= 75
+                                ? 'bg-industrial-warning/10 text-industrial-warning'
+                                : 'bg-industrial-danger/10 text-industrial-danger'
+                          }`}
+                        >
                           {machine.quality}%
                         </span>
                       </td>
@@ -470,15 +482,17 @@ export const ReportViewer = ({ reportId, onReportNotFound }: ReportViewerProps) 
                         {machine.oee}%
                       </td>
                       <td className="text-sm px-4 py-3">
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                          machine.status === 'Online'
-                            ? 'bg-industrial-success/10 text-industrial-success'
-                            : machine.status === 'Warning'
-                              ? 'bg-industrial-warning/10 text-industrial-warning'
-                              : machine.status === 'Offline'
-                                ? 'bg-industrial-danger/10 text-industrial-danger'
-                                : 'bg-industrial-accent/10 text-industrial-accent'
-                        }`}>
+                        <span className={
+                          `px-2 py-0.5 rounded-full text-xs font-medium ${
+                            machine.status === 'Online'
+                              ? 'bg-industrial-success/10 text-industrial-success'
+                              : machine.status === 'Warning'
+                                ? 'bg-industrial-warning/10 text-industrial-warning'
+                                : machine.status === 'Offline'
+                                  ? 'bg-industrial-danger/10 text-industrial-danger'
+                                  : 'bg-industrial-accent/10 text-industrial-accent'
+                          }`}
+                        >
                           {machine.status}
                         </span>
                       </td>
@@ -499,9 +513,9 @@ export const ReportViewer = ({ reportId, onReportNotFound }: ReportViewerProps) 
             <h3 className="text-lg font-semibold flex items-center space-x-2">
               <Activity className="h-4 w-4 text-industrial-accent" />
               Performance Trends
-            </div>
+            </h3>
             <div className="grid gap-4">
-              {Object.entries(reportData.data.trends).map(([key, values]: [string, number[]], index: number) => (
+              {Object.entries(reportData.data.trends).map(([key, values]: [string, any], index: number) => (
                 <div key={index} className="h-48 border border-border/50 rounded-lg">
                   <div className="p-4">
                     <h4 className="font-medium text-sm mb-2">
@@ -529,7 +543,7 @@ export const ReportViewer = ({ reportId, onReportNotFound }: ReportViewerProps) 
             <h3 className="text-lg font-semibold flex items-center space-x-2">
               <FileText className="h-4 w-4 text-industrial-accent" />
               {key.replace('_', ' ').toUpperCase()}
-            </div>
+            </h3>
             <div className="prose prose-sm max-w-none">
               {/* Simplified display for other data types */}
               <pre className="bg-background/50 p-4 rounded-lg overflow-x-auto">{JSON.stringify(

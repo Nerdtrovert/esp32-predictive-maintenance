@@ -1,16 +1,16 @@
 import React from 'react';
-import { 
-  Heart, Gauge, Shield, AlertTriangle, Wrench, 
-  Check, TrendingUp, TrendingDown 
+import {
+  Heart, Gauge, Shield, AlertTriangle, Wrench,
+  Check, TrendingUp, TrendingDown
 } from 'lucide-react';
 
 interface KPIStatProps {
   title: string;
   value: string;
-  trend: 'up' | 'down' | 'neutral';
+  trend: 'up' | 'down' | 'neutral' | string;
   change: string;
   icon: string;
-  color: 'primary' | 'success' | 'warning' | 'accent';
+  color: 'primary' | 'success' | 'warning' | 'accent' | 'destructive';
 }
 
 export const KPIStat = ({
@@ -44,6 +44,7 @@ export const KPIStat = ({
       case 'success': return 'border-success/20 bg-success/5';
       case 'warning': return 'border-warning/20 bg-warning/5';
       case 'accent': return 'border-accent/20 bg-accent/5';
+      case 'destructive': return 'border-destructive/20 bg-destructive/5';
       default: return 'border-border/20 bg-background/5';
     }
   };
@@ -54,20 +55,28 @@ export const KPIStat = ({
       case 'success': return 'text-success';
       case 'warning': return 'text-warning';
       case 'accent': return 'text-accent';
+      case 'destructive': return 'text-destructive';
       default: return 'text-foreground';
     }
   };
 
+  // Compute the icon component
+  const Icon = IconMap[icon];
+  // Compute the trend icon component
+  const TrendIcon = getTrendIcon();
+
   return (
     <div className="p-4 border rounded-lg text-center">
       <div className={`${getColorClass(color)} w-10 h-10 flex items-center justify-center rounded-lg mb-3`}>
-        <IconMap[icon] className={`${getIconColor(color)} h-4 w-4`} />
+        <Icon className={`${getIconColor(color)} h-4 w-4`} />
       </div>
       <h3 className="text-sm font-medium text-foreground/60 mb-2">{title}</h3>
       <p className="text-xl font-bold text-foreground">{value}</p>
       {trend !== 'neutral' && change && (
         <div className="flex items-center justify-center mt-2 text-sm">
-          <getTrendIcon() className={`h-3 w-3 mr-1 ${trend === 'up' ? 'text-success' : 'text-destructive'}`} />
+          {TrendIcon && (
+            <TrendIcon className={`h-3 w-3 mr-1 ${trend === 'up' ? 'text-success' : 'text-destructive'}`} />
+          )}
           <span className={`${trend === 'up' ? 'text-success' : 'text-destructive'}`}>{change}</span>
         </div>
       )}

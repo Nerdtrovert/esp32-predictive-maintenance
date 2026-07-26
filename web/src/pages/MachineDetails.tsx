@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { Card } from '../components/ui/Card';
 import { MachineHeader } from '../components/cards/MachineHeader';
 import { SensorCharts } from '../components/charts/SensorCharts';
@@ -6,12 +7,11 @@ import { HealthTrend } from '../components/charts/HealthTrend';
 import apiService from '../services/apiService';
 
 export const MachineDetails = () => {
-  const [machineId, setMachineId] = useState(1);
-  const [machineData, setMachineData] = useState(null);
-  const [sensorData, setSensorData] = useState(null);
-  const [healthData, setHealthData] = useState(null);
+  const { id } = useParams<{ id: string }>();
+  const machineId = id ? parseInt(id, 10) : 1;
+  const [machineData, setMachineData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -21,14 +21,6 @@ export const MachineDetails = () => {
         // Fetch machine details
         const machine = await apiService.getMachineDetails(machineId);
         setMachineData(machine);
-
-        // Fetch sensor data
-        const sensors = await apiService.getMachineSensorData(machineId);
-        setSensorData(sensors);
-
-        // Fetch health data
-        const health = await apiService.getMachineHealth(machineId);
-        setHealthData(health);
       } catch (err) {
         setError('Failed to load machine data');
         console.error('Error fetching machine data:', err);
@@ -86,10 +78,10 @@ export const MachineDetails = () => {
 
       <div className="grid md:grid-cols-2 gap-6">
         <SensorCharts
-          sensorData={sensorData}
+          machineId={machineId}
         />
         <HealthTrend
-          healthData={healthData}
+          machineId={machineId}
         />
       </div>
     </div>

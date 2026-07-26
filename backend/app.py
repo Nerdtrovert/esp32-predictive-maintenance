@@ -1,10 +1,12 @@
 from datetime import datetime
 import os
+import uuid
 from typing import Any, Dict, List
 
 import uvicorn
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
 
 from health_engine import (
     build_factory_stats,
@@ -17,16 +19,6 @@ from recommendation_engine import (
     build_ai_analysis,
     build_maintenance_recommendations,
     build_recommendations,
-)
-
-app = FastAPI(title="Machine Hawk API", version="1.1.0")
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
 )
 
 MACHINE_CATALOG: Dict[int, str] = {
@@ -44,7 +36,14 @@ MQTT_TOPIC_FILTER = os.getenv("MQTT_TOPIC_FILTER", "machine-hawk/telemetry/+")
 MQTT_DEFAULT_MACHINE_ID = int(os.getenv("MQTT_DEFAULT_MACHINE_ID", "1"))
 MQTT_USERNAME = os.getenv("MQTT_USERNAME", "")
 MQTT_PASSWORD = os.getenv("MQTT_PASSWORD", "")
-MQTT_CLIENT_ID = os.getenv("MQTT_CLIENT_ID", "machine-hawk-backend")
+default_client_id = f"machine-hawk-backend-{uuid.uuid4().hex[:8]}"
+MQTT_CLIENT_ID = os.getenv("MQTT_CLIENT_ID", default_client_id)
+MQTT_ENABLE_SEED_DATA = os.getenv("MQTT_ENABLE_SEED_DATA", "false").strip().lower() in {
+    "1",
+    "true",
+    "yes",
+    "on",
+}
 
 SEED_TELEMETRY: Dict[int, Dict[str, Any]] = {
     1: {"temperature": 29.1, "predicted_temp": 30.0, "anomaly_score": 21.8, "anomaly": False},
@@ -53,9 +52,9 @@ SEED_TELEMETRY: Dict[int, Dict[str, Any]] = {
     4: {"temperature": 28.3, "predicted_temp": 29.2, "anomaly_score": 17.3, "anomaly": False},
 }
 
-
-for machine_id, payload in SEED_TELEMETRY.items():
-    telemetry_store.ingest(machine_id, payload)
+if MQTT_ENABLE_SEED_DATA:
+    for machine_id, payload in SEED_TELEMETRY.items():
+        telemetry_store.ingest(machine_id, payload)
 
 mqtt_bridge = MQTTIngestBridge(
     store=telemetry_store,
@@ -69,6 +68,23 @@ mqtt_bridge = MQTTIngestBridge(
     client_id=MQTT_CLIENT_ID,
 )
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    mqtt_bridge.start()
+    yield
+    # Shutdown
+    mqtt_bridge.stop()
+
+app = FastAPI(title="Machine Hawk API", version="1.1.0", lifespan=lifespan)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 def get_machine_views() -> List[Dict[str, Any]]:
     machines: List[Dict[str, Any]] = []
@@ -143,16 +159,6 @@ async def health_check() -> Dict[str, str]:
     return {"status": "healthy", "timestamp": datetime.now().isoformat()}
 
 
-@app.on_event("startup")
-async def start_mqtt_bridge() -> None:
-    mqtt_bridge.start()
-
-
-@app.on_event("shutdown")
-async def stop_mqtt_bridge() -> None:
-    mqtt_bridge.stop()
-
-
 @app.get("/api/mqtt/status")
 async def get_mqtt_status() -> Dict[str, Any]:
     return mqtt_bridge.status()
@@ -191,14 +197,19 @@ async def get_recent_alerts() -> List[Dict[str, Any]]:
 @app.get("/api/factory/summary")
 async def get_quick_summary() -> List[Dict[str, Any]]:
     machines = get_machine_views()
+    mqtt_status = mqtt_bridge.status()
+    total_count = len(machines)
     online_count = len([m for m in machines if m["status"] == "online"])
-    avg_health = round(sum(m["health"] for m in machines) / len(machines), 1) if machines else 0.0
+    avg_health = round(sum(m["health"] for m in machines) / total_count, 1) if machines else 0.0
+    active_alerts = len([m for m in machines if m["status"] in {"warning", "offline"}])
+    messages_received = int(mqtt_status["messages_received"])
 
     return [
         {"label": "Overall Equipment Effectiveness", "value": f"{avg_health}%", "icon": "activity"},
-        {"label": "Active Operators", "value": "12", "icon": "users"},
-        {"label": "Units Produced Today", "value": "1,248", "icon": "package"},
+        {"label": "Machines Reporting", "value": f"{total_count}", "icon": "users"},
         {"label": "Machines Online", "value": f"{online_count}", "icon": "clock"},
+        {"label": "MQTT Messages Received", "value": f"{messages_received}", "icon": "package"},
+        {"label": "Active Alerts", "value": f"{active_alerts}", "icon": "activity"},
     ]
 
 

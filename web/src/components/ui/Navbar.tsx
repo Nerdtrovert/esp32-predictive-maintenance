@@ -1,6 +1,7 @@
 import { 
   Search, 
-  Bell as user} from 'lucide-react';
+  Bell
+} from 'lucide-react';
 
 export const Navbar = () => {
   return (

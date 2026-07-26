@@ -11,24 +11,25 @@ export const Reports = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchReports = async () => {
-      try {
-        setLoading(true);
-        const data = await apiService.getReports();
-        setReports(data);
-        // Select first report by default if available
-        if (data.length > 0 && !selectedReportId) {
-          setSelectedReportId(data[0].id);
-        }
-      } catch (err) {
-        setError('Failed to load reports');
-        console.error('Error fetching reports:', err);
-      } finally {
-        setLoading(false);
+  const fetchReports = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await apiService.getReports();
+      setReports(data);
+      // Select first report by default if available
+      if (data.length > 0 && !selectedReportId) {
+        setSelectedReportId(data[0].id);
       }
-    };
+    } catch (err) {
+      setError('Failed to load reports');
+      console.error('Error fetching reports:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchReports();
   }, []);
 

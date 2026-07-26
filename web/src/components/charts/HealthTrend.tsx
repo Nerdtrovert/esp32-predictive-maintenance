@@ -3,16 +3,16 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { TrendingUp, ShieldCheck, Activity, Zap } from 'lucide-react';
 import apiService from '../../services/apiService';
 
-export const HealthTrend = () => {
-  const [healthData, setHealthData] = useState(null);
+export const HealthTrend = ({ machineId = 1 }: { machineId?: number }) => {
+  const [healthData, setHealthData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchHealthData = async () => {
       try {
         setLoading(true);
-        const data = await apiService.getMachineHealth(1); // Machine ID 1 for now
+        const data = await apiService.getMachineHealth(machineId);
         setHealthData(data);
       } catch (err) {
         setError('Failed to load health data');
@@ -23,7 +23,7 @@ export const HealthTrend = () => {
     };
 
     fetchHealthData();
-  }, []);
+  }, [machineId]);
 
   // Mock data for fallback
   const mockHealthData = {
@@ -182,6 +182,7 @@ export const HealthTrend = () => {
               </div>
             </div>
           </div>
+        </div>
 
           <div className="border-t border-border/50 pt-4">
             <h3 className="text-sm font-medium text-foreground/60">Maintenance Impact</h3>
@@ -191,7 +192,7 @@ export const HealthTrend = () => {
                 <div>
                   <div className="font-medium">
                     Last Maintenance: {data.maintenance_status === 'Good' ? '2 hours ago' : '6 hours ago'}
-                  </p>
+                  </div>
                   <p className="text-xs text-muted-foreground">
                     Preventive maintenance completed
                   </p>
@@ -202,7 +203,7 @@ export const HealthTrend = () => {
                 <Zap className="h-4 w-4 text-industrial-warning" />
                 <div>
                   <div className="font-medium">
-                    Next Scheduled: {data.maintenance_status === 'Good' ? 'In 8 hours' : 'In 2 hours'}
+                    Next Scheduled: {data.indicators.maintenance_status === 'Good' ? 'In 8 hours' : 'In 2 hours'}
                   </div>
                   <p className="text-xs text-muted-foreground">
                     Lubrication check
@@ -224,7 +225,7 @@ export const HealthTrend = () => {
                     <svg width="100%" height="100%" className="block">
                       <polyline
                         points={data.health_trend
-                          .map((point, index) => {
+                          .map((point: number, index: number) => {
                             const x = (index / (data.health_trend.length - 1)) * 100;
                             const y = 100 - ((point - 70) / 40) * 100; // Normalize 70-110 range
                             return `${x}%,${y}%`;
@@ -246,8 +247,8 @@ export const HealthTrend = () => {
                   </div>
                 )}
               </div>
-            </div>
           </div>
+        </div>
         </CardContent>
       </Card>
     );

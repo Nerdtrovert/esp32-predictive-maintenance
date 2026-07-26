@@ -1,18 +1,45 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
-import { LineChart2, Activity, Zap, Thermometer } from 'lucide-react';
+import { LineChart, Activity, Zap, Thermometer } from 'lucide-react';
 import apiService from '../../services/apiService';
 
-export const SensorCharts = () => {
-  const [sensorData, setSensorData] = useState(null);
+type ChartPoint = { x: number; y: number };
+
+const normalizeSeries = (series: unknown): ChartPoint[] => {
+  if (!Array.isArray(series)) {
+    return [];
+  }
+
+  return series
+    .map((point, index) => {
+      if (typeof point === 'number') {
+        return { x: index, y: point };
+      }
+
+      if (
+        point &&
+        typeof point === 'object' &&
+        typeof (point as any).x === 'number' &&
+        typeof (point as any).y === 'number'
+      ) {
+        return point as ChartPoint;
+      }
+
+      return null;
+    })
+    .filter((point): point is ChartPoint => point !== null);
+};
+
+export const SensorCharts = ({ machineId = 1 }: { machineId?: number }) => {
+  const [sensorData, setSensorData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchSensorData = async () => {
       try {
         setLoading(true);
-        const data = await apiService.getMachineSensorData(1); // Machine ID 1 for now
+        const data = await apiService.getMachineSensorData(machineId);
         setSensorData(data);
       } catch (err) {
         setError('Failed to load sensor data');
@@ -23,26 +50,14 @@ export const SensorCharts = () => {
     };
 
     fetchSensorData();
-  }, []);
+  }, [machineId]);
 
-  // Mock data for fallback
-  const mockData = {
-    temperature: Array.from({ length: 20 }, (_, i) => ({
-      x: i,
-      y: 70 + Math.sin(i * 0.5) * 5 + Math.random() * 3
-    })),
-    vibration: Array.from({ length: 20 }, (_, i) => ({
-      x: i,
-      y: 2 + Math.cos(i * 0.3) * 1 + Math.random() * 0.5
-    })),
-    power: Array.from({ length: 20 }, (_, i) => ({
-      x: i,
-      y: 45 + Math.sin(i * 0.4) * 8 + Math.random() * 4
-    })),
-    hours: Array.from({ length: 24 }, (_, i) => `${String(i + 6).padStart(2, '0')}:00`)
-  };
-
-  const data = sensorData || mockData;
+  const temperatureSeries = normalizeSeries(sensorData?.temperature);
+  const vibrationSeries = normalizeSeries(sensorData?.vibration);
+  const powerSeries = normalizeSeries(sensorData?.power);
+  const lastTemperature = temperatureSeries.at(-1)?.y;
+  const lastVibration = vibrationSeries.at(-1)?.y;
+  const lastPower = powerSeries.at(-1)?.y;
 
   if (loading) {
     return (
@@ -91,13 +106,13 @@ export const SensorCharts = () => {
             <div className="h-24">
               <div className="border border-border/50 rounded-lg p-4 bg-gradient-to-b from-industrial-blue/5 to-transparent">
                 <div className="flex h-full items-center justify-center">
-                  {data.temperature && data.temperature.length > 0 ? (
+                  {temperatureSeries.length > 0 ? (
                     <>
                       <svg width="100%" height="100%" className="block">
                         <polyline
-                          points={data.temperature
-                            .map((point, index) => {
-                              const x = (index / (data.temperature.length - 1)) * 100;
+                          points={temperatureSeries
+                            .map((point: any, index: number) => {
+                              const x = (index / (temperatureSeries.length - 1)) * 100;
                               const y = 100 - ((point.y - 65) / 15) * 100; // Normalize 65-80 range
                               return `${x}%,${y}%`;
                             })
@@ -109,10 +124,10 @@ export const SensorCharts = () => {
                       </svg>
                       <div className="mt-2 text-center">
                         <div className="text-lg font-semibold text-industrial-warning">
-                          {data.temperature[data.temperature.length - 1]?.y.toFixed(1)}°C
+                          {lastTemperature?.toFixed(1)}°C
                         </div>
                         <div className="text-xs text-muted-foreground">
-                          {data.temperature[data.temperature.length - 1]?.y > 75 ? 'High' : 'Normal'}
+                          {(lastTemperature ?? 0) > 75 ? 'High' : 'Normal'}
                         </div>
                       </div>
                     </>
@@ -133,13 +148,13 @@ export const SensorCharts = () => {
             <div className="h-24">
               <div className="border border-border/50 rounded-lg p-4 bg-gradient-to-b from-industrial-warning/5 to-transparent">
                 <div className="flex h-full items-center justify-center">
-                  {data.vibration && data.vibration.length > 0 ? (
+                  {vibrationSeries.length > 0 ? (
                     <>
                       <svg width="100%" height="100%" className="block">
                         <polyline
-                          points={data.vibration
-                            .map((point, index) => {
-                              const x = (index / (data.vibration.length - 1)) * 100;
+                          points={vibrationSeries
+                            .map((point: any, index: number) => {
+                              const x = (index / (vibrationSeries.length - 1)) * 100;
                               const y = 100 - ((point.y - 1.5) / 3) * 100; // Normalize 1.5-4.5 range
                               return `${x}%,${y}%`;
                             })
@@ -151,10 +166,10 @@ export const SensorCharts = () => {
                       </svg>
                       <div className="mt-2 text-center">
                         <div className="text-lg font-semibold text-industrial-danger">
-                          {data.vibration[data.vibration.length - 1]?.y.toFixed(1)} mm/s
+                          {lastVibration?.toFixed(1)} mm/s
                         </div>
                         <div className="text-xs text-muted-foreground">
-                          {data.vibration[data.vibration.length - 1]?.y > 3 ? 'High' : 'Normal'}
+                          {(lastVibration ?? 0) > 3 ? 'High' : 'Normal'}
                         </div>
                       </div>
                     </>
@@ -175,13 +190,13 @@ export const SensorCharts = () => {
             <div className="h-24">
               <div className="border border-border/50 rounded-lg p-4 bg-gradient-to-b from-industrial-accent/5 to-transparent">
                 <div className="flex h-full items-center justify-center">
-                  {data.power && data.power.length > 0 ? (
+                  {powerSeries.length > 0 ? (
                     <>
                       <svg width="100%" height="100%" className="block">
                         <polyline
-                          points={data.power
-                            .map((point, index) => {
-                              const x = (index / (data.power.length - 1)) * 100;
+                          points={powerSeries
+                            .map((point: any, index: number) => {
+                              const x = (index / (powerSeries.length - 1)) * 100;
                               const y = 100 - ((point.y - 35) / 20) * 100; // Normalize 35-55 range
                               return `${x}%,${y}%`;
                             })
@@ -193,10 +208,10 @@ export const SensorCharts = () => {
                       </svg>
                       <div className="mt-2 text-center">
                         <div className="text-lg font-semibold text-industrial-accent">
-                          {data.power[data.power.length - 1]?.y.toFixed(1)} kW
+                          {lastPower?.toFixed(1)} kW
                         </div>
                         <div className="text-xs text-muted-foreground">
-                          {data.power[data.power.length - 1]?.y > 50 ? 'High' : 'Normal'}
+                          {(lastPower ?? 0) > 50 ? 'High' : 'Normal'}
                         </div>
                       </div>
                     </>
@@ -215,19 +230,19 @@ export const SensorCharts = () => {
 
         <div className="mt-4 pt-4 border-t border-border/50">
           <div className="flex items-center space-x-3 mb-3">
-            <LineChart2 className="h-4 w-4 text-industrial-primary" />
+            <LineChart className="h-4 w-4 text-industrial-primary" />
             <h3 className="text-sm font-medium text-foreground/60">Combined View</h3>
           </div>
           <div className="h-32 border border-border/50 rounded-lg p-4">
             <div className="flex h-full items-center justify-center">
-              {data.temperature && data.vibration && data.power ? (
+              {temperatureSeries.length > 0 && vibrationSeries.length > 0 && powerSeries.length > 0 ? (
                 <>
                   <svg width="100%" height="100%" className="block">
                     {/* Temperature line */}
                     <polyline
-                      points={data.temperature
-                        .map((point, index) => {
-                          const x = (index / (data.temperature.length - 1)) * 100;
+                      points={temperatureSeries
+                        .map((point: any, index: number) => {
+                          const x = (index / (temperatureSeries.length - 1)) * 100;
                           const y = 100 - ((point.y - 65) / 15) * 100;
                           return `${x}%,${y}%`;
                         })
@@ -238,9 +253,9 @@ export const SensorCharts = () => {
                     />
                     {/* Vibration line */}
                     <polyline
-                      points={data.vibration
-                        .map((point, index) => {
-                          const x = (index / (data.vibration.length - 1)) * 100;
+                      points={vibrationSeries
+                        .map((point: any, index: number) => {
+                          const x = (index / (vibrationSeries.length - 1)) * 100;
                           const y = 100 - ((point.y - 1.5) / 3) * 100;
                           return `${x}%,${y}%`;
                         })
@@ -251,9 +266,9 @@ export const SensorCharts = () => {
                     />
                     {/* Power line */}
                     <polyline
-                      points={data.power
-                        .map((point, index) => {
-                          const x = (index / (data.power.length - 1)) * 100;
+                      points={powerSeries
+                        .map((point: any, index: number) => {
+                          const x = (index / (powerSeries.length - 1)) * 100;
                           const y = 100 - ((point.y - 35) / 20) * 100;
                           return `${x}%,${y}%`;
                         })

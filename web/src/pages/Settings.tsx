@@ -5,29 +5,30 @@ import apiService from '../services/apiService';
 import { Loader, AlertTriangle, CheckCircle2 } from 'lucide-react';
 
 export const Settings = () => {
-  const [settings, setSettings] = useState(null);
+  const [settings, setSettings] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [successMessage, setSuccessMessage] = useState(null);
+  const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const fetchSettings = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await apiService.getSettings();
+      setSettings(data);
+    } catch (err) {
+      setError('Failed to load settings');
+      console.error('Error fetching settings:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchSettings = async () => {
-      try {
-        setLoading(true);
-        const data = await apiService.getSettings();
-        setSettings(data);
-      } catch (err) {
-        setError('Failed to load settings');
-        console.error('Error fetching settings:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchSettings();
   }, []);
 
-  const handleSaveSettings = async (formData) => {
+  const handleSaveSettings = async (formData: any) => {
     try {
       await apiService.updateSettings(formData);
       setSuccessMessage('Settings saved successfully!');
@@ -63,12 +64,7 @@ export const Settings = () => {
           <AlertTriangle className="h-8 w-8 text-industrial-danger mb-4" />
           <p className="text-center text-destructive">{error}</p>
           <button
-            onClick={() => {
-              setLoading(true);
-              setError(null);
-              // Retry fetching settings
-              apiService.getSettings().then(setSettings).finally(() => setLoading(false));
-            }}
+            onClick={fetchSettings}
             className="mt-4 px-4 py-2 border border-industrial-danger/50 rounded-lg hover:bg-industrial-danger/10 text-industrial-danger text-sm transition-colors"
           >
             Retry

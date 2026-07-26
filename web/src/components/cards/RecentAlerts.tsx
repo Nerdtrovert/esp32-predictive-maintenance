@@ -4,9 +4,9 @@ import { Bell, Loader2, Zap, TrendingUp, CheckCircle2, Info } from 'lucide-react
 import apiService from '../../services/apiService';
 
 export const RecentAlerts = () => {
-  const [alerts, setAlerts] = useState([]);
+  const [alerts, setAlerts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchAlerts = async () => {

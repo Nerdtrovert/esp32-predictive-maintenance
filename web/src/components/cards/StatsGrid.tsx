@@ -4,9 +4,9 @@ import { KPIStat } from './KPIStat';
 import apiService from '../../services/apiService';
 
 export const StatsGrid = () => {
-  const [stats, setStats] = useState([]);
+  const [stats, setStats] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -113,7 +113,7 @@ export const StatsGrid = () => {
 
   return (
     <Card>
-      <div className="gap-4 md:grid-cols-3 lg:grid-cols-5">
+      <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-5">
         {displayStats.map((stat, index) => (
           <KPIStat key={index} {...stat} />
         ))}

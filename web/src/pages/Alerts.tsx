@@ -6,7 +6,7 @@ import apiService from '../services/apiService';
 export const Alerts = () => {
   const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchAlerts = async () => {

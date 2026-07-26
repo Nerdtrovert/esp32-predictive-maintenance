@@ -4,9 +4,9 @@ import { MachineStatusCard } from './MachineStatusCard';
 import apiService from '../../services/apiService';
 
 export const MachineStatusGrid = () => {
-  const [machines, setMachines] = useState([]);
+  const [machines, setMachines] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchMachines = async () => {

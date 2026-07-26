@@ -9,9 +9,9 @@ import {
 import apiService from '../../services/apiService';
 
 export const QuickSummary = () => {
-  const [summary, setSummary] = useState([]);
+  const [summary, setSummary] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchSummary = async () => {
@@ -31,26 +31,33 @@ export const QuickSummary = () => {
   }, []);
 
   // Default data in case of loading or error
+  const IconMap: Record<string, any> = {
+    activity: Activity,
+    users: Users,
+    package: Package,
+    clock: Clock
+  };
+
   const defaultSummary = [
     {
       label: "Overall Equipment Effectiveness",
       value: "87%",
-      icon: Activity
+      icon: "activity"
     },
     {
       label: "Active Operators",
       value: "12",
-      icon: Users
+      icon: "users"
     },
     {
       label: "Units Produced Today",
       value: "1,248",
-      icon: Package
+      icon: "package"
     },
     {
       label: "Average Cycle Time",
       value: "45s",
-      icon: Clock
+      icon: "clock"
     }
   ];
 
@@ -75,30 +82,36 @@ export const QuickSummary = () => {
   if (error) {
     return (
       <Card className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {displayData.map((item, index) => (
-          <div key={index} className="flex items-center space-x-3 p-4 bg-card">
-            <item.icon className="h-5 w-5 text-primary" />
-            <div>
-              <h3 className="text-sm font-medium text-foreground/60">{item.label}</h3>
-              <p className="text-lg font-semibold text-destructive">Error loading data</p>
+        {displayData.map((item: any, index) => {
+          const IconComponent = IconMap[item.icon] || Activity;
+          return (
+            <div key={index} className="flex items-center space-x-3 p-4 bg-card">
+              <IconComponent className="h-5 w-5 text-primary" />
+              <div>
+                <h3 className="text-sm font-medium text-foreground/60">{item.label}</h3>
+                <p className="text-lg font-semibold text-destructive">Error loading data</p>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </Card>
     );
   }
 
   return (
     <Card className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {displayData.map((item, index) => (
-        <div key={index} className="flex items-center space-x-3 p-4 bg-card">
-          <item.icon className="h-5 w-5 text-primary" />
-          <div>
-            <h3 className="text-sm font-medium text-foreground/60">{item.label}</h3>
-            <p className="text-lg font-semibold text-foreground">{item.value}</p>
+      {displayData.map((item: any, index) => {
+        const IconComponent = IconMap[item.icon] || Activity;
+        return (
+          <div key={index} className="flex items-center space-x-3 p-4 bg-card">
+            <IconComponent className="h-5 w-5 text-primary" />
+            <div>
+              <h3 className="text-sm font-medium text-foreground/60">{item.label}</h3>
+              <p className="text-lg font-semibold text-foreground">{item.value}</p>
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </Card>
   );
 };

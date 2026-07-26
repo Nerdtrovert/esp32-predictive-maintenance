@@ -45,7 +45,7 @@ export const SettingsForm = ({ initialData, onSubmit, error }: SettingsFormProps
   const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
 
   const handleInputChange = (section: string, field: string, value: any) => {
-    setFormState(prev => ({
+    setFormState((prev: any) => ({
       ...prev,
       [section]: {
         ...prev[section],
@@ -55,7 +55,7 @@ export const SettingsForm = ({ initialData, onSubmit, error }: SettingsFormProps
   };
 
   const handleToggleChange = (section: string, field: string, checked: boolean) => {
-    setFormState(prev => ({
+    setFormState((prev: any) => ({
       ...prev,
       [section]: {
         ...prev[section],
@@ -348,7 +348,7 @@ export const SettingsForm = ({ initialData, onSubmit, error }: SettingsFormProps
               <div>
                 <label className="block text-sm font-medium text-muted-foreground mb-2">Historians</label>
                 <div className="space-y-2">
-                  {['OSIsoft PI', 'Wonderware Historian', 'AspenTech InfoPlus.21'].map((historian, index) => (
+                  {['OSIsoft PI', 'Wonderware Historian', 'AspenTech InfoPlus.21'].map((historian: string, index: number) => (
                     <div key={index} className="flex items-center">
                       <input
                         type="checkbox"
@@ -359,9 +359,9 @@ export const SettingsForm = ({ initialData, onSubmit, error }: SettingsFormProps
                           const historians = [...(formState.integrations.historians || []), historian];
                           const updatedHistorians = isChecked
                             ? historians
-                            : (formState.integrations.historians || []).filter(h => h !== historian);
+                            : (formState.integrations.historians || []).filter((h: string) => h !== historian);
 
-                          setFormState(prev => ({
+                          setFormState((prev: any) => ({
                             ...prev,
                             integrations: {
                               ...prev.integrations,

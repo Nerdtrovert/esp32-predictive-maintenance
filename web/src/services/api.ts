@@ -1,6 +1,6 @@
 import apiService, { apiClient } from './apiService';
 
-const wrap = (fn) => (...args) =>
+const wrap = (fn: (...args: any[]) => Promise<any>) => (...args: any[]) =>
   fn(...args).then((data) => ({ data }));
 
 export const factoryApi = {

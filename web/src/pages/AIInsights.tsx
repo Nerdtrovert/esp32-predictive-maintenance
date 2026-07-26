@@ -7,10 +7,10 @@ import { Recommendations } from '@/components/cards/Recommendations';
 import apiService from '@/services/apiService';
 
 export const AIInsights = () => {
-  const [aiAnalysis, setAiAnalysis] = useState(null);
-  const [aiRecommendations, setAiRecommendations] = useState(null);
+  const [aiAnalysis, setAiAnalysis] = useState<any>(null);
+  const [aiRecommendations, setAiRecommendations] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -77,7 +77,7 @@ export const AIInsights = () => {
       icon: "shield-check",
       category: "Safety"
     }
-  ];
+  ] as const;
 
   const analysisData = aiAnalysis || defaultAnalysis;
   const recommendationsData = aiRecommendations || defaultRecommendations;

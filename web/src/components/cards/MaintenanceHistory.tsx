@@ -6,28 +6,29 @@ import apiService from '../../services/apiService';
 export const MaintenanceHistory = () => {
   const [maintenanceRecords, setMaintenanceRecords] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState({
     type: 'all',
     status: 'all',
     search: ''
   });
-  const [showDropdown, setShowDropdown] = useState(null);
+  const [showDropdown, setShowDropdown] = useState<string | null>(null);
+
+  const fetchMaintenanceHistory = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await apiService.getMaintenanceHistory();
+      setMaintenanceRecords(data);
+    } catch (err) {
+      setError('Failed to load maintenance history');
+      console.error('Error fetching maintenance history:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchMaintenanceHistory = async () => {
-      try {
-        setLoading(true);
-        const data = await apiService.getMaintenanceHistory();
-        setMaintenanceRecords(data);
-      } catch (err) {
-        setError('Failed to load maintenance history');
-        console.error('Error fetching maintenance history:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchMaintenanceHistory();
   }, []);
 
@@ -70,7 +71,7 @@ export const MaintenanceHistory = () => {
         <CardContent className="flex h-full items-center justify-center">
           <div className="space-y-4">
             <div className="h-6 w-6">
-              <Loader className="h-6 w-6 text-industrial-accent" />
+              <Loader2 className="h-6 w-6 text-industrial-accent" />
             </div>
             <p className="text-sm text-muted-foreground">Loading maintenance records...</p>
           </div>
@@ -92,11 +93,7 @@ export const MaintenanceHistory = () => {
           <div className="space-y-3 text-center">
             <p className="text-destructive">{error}</p>
             <button
-              onClick={() => {
-                setLoading(true);
-                setError(null);
-                fetchMaintenanceHistory();
-              }}
+              onClick={fetchMaintenanceHistory}
               className="px-4 py-2 border border-industrial-danger/50 rounded-lg hover:bg-industrial-danger/10 text-industrial-danger text-sm transition-colors"
             >
               Try Again
@@ -208,6 +205,7 @@ export const MaintenanceHistory = () => {
                 </div>
               </div>
             )}
+          </div>
 
           {/* Status Filter */}
           <div className="relative dropdown">

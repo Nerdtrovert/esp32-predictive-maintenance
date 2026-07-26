@@ -7,7 +7,7 @@ interface RecommendationItem {
   title: string;
   description: string;
   priority: 'high' | 'medium' | 'low';
-  icon: any; // React component type
+  icon: string;
   category: string;
 }
 
@@ -16,6 +16,13 @@ interface RecommendationsProps {
 }
 
 export const Recommendations = ({ recommendations }: RecommendationsProps) => {
+  const IconMap: Record<string, any> = {
+    'check-circle': CheckCircle,
+    'trending-up': TrendingUp,
+    'shield-check': ShieldCheck,
+    'clock': Clock,
+  };
+
   if (recommendations.length === 0) {
     return (
       <Card className="h-full">
@@ -42,33 +49,36 @@ export const Recommendations = ({ recommendations }: RecommendationsProps) => {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-3">
-          {recommendations.map((rec) => (
-            <div key={rec.id} className="border border-border/50 rounded-lg overflow-hidden">
-              <div className="flex items-start space-x-3 p-4">
-                <div className="flex-shrink-0">
-                  {rec.icon}
-                </div>
-                <div className="flex-1 space-y-2">
-                  <div className="flex items-start justify-between">
-                    <h3 className="font-medium text-sm">{rec.title}</h3>
-                    <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${
-                      rec.priority === 'high'
-                        ? 'bg-industrial-danger/10 text-industrial-danger'
-                        : rec.priority === 'medium'
-                          ? 'bg-industrial-warning/10 text-industrial-warning'
-                          : 'bg-industrial-success/10 text-industrial-success'
-                    }`}>
-                      {rec.priority.toUpperCase()} PRIORITY
-                    </span>
+          {recommendations.map((rec) => {
+            const IconComponent = IconMap[rec.icon] || CheckCircle;
+            return (
+              <div key={rec.id} className="border border-border/50 rounded-lg overflow-hidden">
+                <div className="flex items-start space-x-3 p-4">
+                  <div className="flex-shrink-0">
+                    <IconComponent className="h-5 w-5 text-primary" />
                   </div>
-                  <p className="text-sm text-muted-foreground">{rec.description}</p>
-                  <div className="flex items-center space-x-4 text-xs text-muted-foreground">
-                    <span>Category: {rec.category}</span>
+                  <div className="flex-1 space-y-2">
+                    <div className="flex items-start justify-between">
+                      <h3 className="font-medium text-sm">{rec.title}</h3>
+                      <span className={`px-2 py-0.5 text-xs rounded-full font-medium ${
+                        rec.priority === 'high'
+                          ? 'bg-industrial-danger/10 text-industrial-danger'
+                          : rec.priority === 'medium'
+                            ? 'bg-industrial-warning/10 text-industrial-warning'
+                            : 'bg-industrial-success/10 text-industrial-success'
+                      }`}>
+                        {rec.priority.toUpperCase()} PRIORITY
+                      </span>
+                    </div>
+                    <p className="text-sm text-muted-foreground">{rec.description}</p>
+                    <div className="flex items-center space-x-4 text-xs text-muted-foreground">
+                      <span>Category: {rec.category}</span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </CardContent>
     </Card>

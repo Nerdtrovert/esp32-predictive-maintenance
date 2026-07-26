@@ -1,10 +1,9 @@
-import { CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import * as React from 'react';
 
 import { cn } from '@/lib/utils';
 
 const Card = React.forwardRef<
-  React.HTMLDivElement,
+  HTMLDivElement,
   React.ComponentPropsWithoutRef<'div'> & {
     className?: string;
   }

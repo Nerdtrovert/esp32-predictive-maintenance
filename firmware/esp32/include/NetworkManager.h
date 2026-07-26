@@ -19,12 +19,20 @@ private:
     WiFiClient espClient;
     PubSubClient mqttClient;
     MessageCallback onMessageReceived;
-    
+
     void connectWiFi();
     void reconnectMQTT();
     static void mqttCallback(char* topic, byte* payload, unsigned int length);
-    
+
     static NetworkManager* instance;
+
+    // WiFi connection tracking
+    unsigned long lastWiFiAttempt;
+    bool wifiConnectInProgress;
+
+    // MQTT connection tracking
+    unsigned long lastMqttAttempt;
+    bool mqttConnectInProgress;
 };
 
 #endif // NETWORK_MANAGER_H

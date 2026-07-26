@@ -210,13 +210,18 @@ This project is licensed under the [MIT License](LICENSE).
 
   1. Backend:
   cd backend
+  python3 -m venv .venv
+  source .venv/bin/activate
   pip install -r requirements.txt
   # Optional MQTT broker overrides for backend subscriber:
   # export MQTT_BROKER_HOST=broker.hivemq.com
   # export MQTT_BROKER_PORT=1883
   # export MQTT_TOPIC_FILTER=machine-hawk/telemetry/+
+  # export MQTT_ENABLE_SEED_DATA=true  # optional demo-only seeded data
   python app.py
   API will be available at http://localhost:8000
+  # when done:
+  deactivate
 
   2. Frontend:
   cd web

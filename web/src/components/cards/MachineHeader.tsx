@@ -2,13 +2,14 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Gauge, Thermometer, Activity, Zap } from 'lucide-react';
 
 export const MachineHeader = ({ machine }: { machine: any }) => {
-  // Use default data if machine is not provided
   const data = machine || {
-    name: 'Press Line Alpha',
-    status: 'online',
-    health: 94,
-    temperature: 72.3,
-    vibration: 2.1
+    name: 'Unknown Machine',
+    status: 'offline',
+    health: 0,
+    temperature: 0,
+    vibration: 0,
+    predicted_temp: 0,
+    anomaly_score: 0
   };
 
   return (
@@ -65,8 +66,8 @@ export const MachineHeader = ({ machine }: { machine: any }) => {
             <Zap className="h-5 w-5 text-industrial-accent" />
           </div>
           <div className="space-y-1">
-            <p className="text-xs text-muted-foreground">Power</p>
-            <p className="text-lg font-semibold">45.2 kW</p>
+            <p className="text-xs text-muted-foreground">Predicted Temp</p>
+            <p className="text-lg font-semibold">{data.predicted_temp}°C</p>
           </div>
         </div>
 
@@ -75,8 +76,8 @@ export const MachineHeader = ({ machine }: { machine: any }) => {
             <Gauge className="h-5 w-5 text-industrial-success" />
           </div>
           <div className="space-y-1">
-            <p className="text-xs text-muted-foreground">Pressure</p>
-            <p className="text-lg font-semibold">120.5 psi</p>
+            <p className="text-xs text-muted-foreground">Anomaly Score</p>
+            <p className="text-lg font-semibold">{data.anomaly_score}</p>
           </div>
         </div>
       </div>
