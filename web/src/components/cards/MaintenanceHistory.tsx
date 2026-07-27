@@ -21,8 +21,20 @@ export const MaintenanceHistory = () => {
       const data = await apiService.getMaintenanceHistory();
       setMaintenanceRecords(data);
     } catch (err) {
-      setError('Failed to load maintenance history');
+      setError('Unable to connect to hardware. Showing last known data.');
       console.error('Error fetching maintenance history:', err);
+      // Try to load past data from localStorage
+      try {
+        const savedData = localStorage.getItem('maintenanceHistory');
+        if (savedData) {
+          setMaintenanceRecords(JSON.parse(savedData));
+          setLoading(false);
+          return;
+        }
+      } catch (e) {
+        console.error('Error parsing saved data:', e);
+      }
+      setMaintenanceRecords([]); // Fallback to empty array
     } finally {
       setLoading(false);
     }
@@ -32,23 +44,8 @@ export const MaintenanceHistory = () => {
     fetchMaintenanceHistory();
   }, []);
 
-  // Mock multiple machines data for more realistic scenario
-  const mockMaintenanceRecords = [
-    { id: 1, date: '2024-01-15', equipment: 'Press Line Alpha', type: 'Preventive', status: 'Completed', technician: 'John Smith', hours: 1240 },
-    { id: 2, date: '2024-01-14', equipment: 'Conveyor Belt Beta', type: 'Corrective', status: 'Completed', technician: 'Sarah Johnson', hours: 890 },
-    { id: 3, date: '2024-01-13', equipment: 'Hydraulic Press Gamma', type: 'Predictive', status: 'In Progress', technician: 'Mike Wilson', hours: 2100 },
-    { id: 4, date: '2024-01-12', equipment: 'Assembly Line Delta', type: 'Preventive', status: 'Scheduled', technician: 'Lisa Davis', hours: 560 },
-    { id: 5, date: '2024-01-11', equipment: 'Robotic Arm Epsilon', type: 'Predictive', status: 'Completed', technician: 'Tom Brown', hours: 1800 },
-    { id: 6, date: '2024-01-10', equipment: 'Press Line Alpha', type: 'Predictive', status: 'Completed', technician: 'John Smith', hours: 1200 },
-    { id: 7, date: '2024-01-09', equipment: 'Conveyor Belt Beta', type: 'Preventive', status: 'Completed', technician: 'Sarah Johnson', hours: 850 },
-    { id: 8, date: '2024-01-08', equipment: 'Hydraulic Press Gamma', type: 'Corrective', status: 'Completed', technician: 'Mike Wilson', hours: 2050 },
-    { id: 9, date: '2024-01-07', equipment: 'Assembly Line Delta', type: 'Predictive', status: 'In Progress', technician: 'Lisa Davis', hours: 520 },
-    { id: 10, date: '2024-01-06', equipment: 'CNC Machine Zeta', type: 'Preventive', status: 'Scheduled', technician: 'Alex Chen', hours: 3200 },
-    { id: 11, date: '2024-01-05', equipment: 'Press Line Alpha', type: 'Corrective', status: 'Completed', technician: 'John Smith', hours: 1180 },
-    { id: 12, date: '2024-01-04', equipment: 'Conveyor Belt Beta', type: 'Predictive', status: 'Scheduled', technician: 'Sarah Johnson', hours: 800 }
-  ];
-
-  const records = maintenanceRecords.length > 0 ? maintenanceRecords : mockMaintenanceRecords;
+  // No mock data - rely solely on API or cached data
+  const records = maintenanceRecords;
 
   // Filter records based on selected filters
   const filteredRecords = records.filter(record => {
@@ -80,21 +77,21 @@ export const MaintenanceHistory = () => {
     );
   }
 
-  if (error) {
+  if (error && maintenanceRecords.length === 0) {
     return (
       <Card className="h-full">
         <CardHeader className="pb-4">
           <div className="flex items-center space-x-3">
-            <AlertTriangle className="h-4 w-4 text-industrial-danger" />
+            <AlertTriangle className="h-4 w-4 text-industrial-warning" />
             <h2 className="text-lg font-semibold">Maintenance History</h2>
           </div>
         </CardHeader>
         <CardContent className="flex h-full items-center justify-center">
           <div className="space-y-3 text-center">
-            <p className="text-destructive">{error}</p>
+            <p className="text-industrial-warning">{error}</p>
             <button
               onClick={fetchMaintenanceHistory}
-              className="px-4 py-2 border border-industrial-danger/50 rounded-lg hover:bg-industrial-danger/10 text-industrial-danger text-sm transition-colors"
+              className="px-4 py-2 border border-industrial-warning/50 rounded-lg hover:bg-industrial-warning/10 text-industrial-warning text-sm transition-colors"
             >
               Try Again
             </button>
@@ -104,7 +101,7 @@ export const MaintenanceHistory = () => {
     );
   }
 
-  if (filteredRecords.length === 0) {
+  if (maintenanceRecords.length === 0 && !error) {
     return (
       <Card className="h-full">
         <CardHeader className="pb-4">
@@ -118,9 +115,9 @@ export const MaintenanceHistory = () => {
             <div className="h-12 w-12 text-industrial-secondary">
               <CheckCircle2 className="h-12 w-12" />
             </div>
-            <p className="text-center text-muted-foreground">No maintenance records found</p>
+            <p className="text-center text-muted-foreground">No maintenance records available</p>
             <p className="text-center text-xs text-muted-foreground">
-              Try adjusting the filters above to see more records
+              Connect to hardware to see live data
             </p>
           </div>
         </CardContent>
@@ -137,20 +134,14 @@ export const MaintenanceHistory = () => {
         </div>
         <div className="ml-auto flex space-x-3">
           {/* Search */}
-          <div className="relative">
+          <div className="relative mb-4">
             <input
               type="text"
               placeholder="Search equipment or technician..."
               value={filters.search}
               onChange={(e) => setFilters(prev => ({...prev, search: e.target.value}))}
-              className="px-3 py-2 border border-border/50 rounded-l-lg focus:ring-2 focus-ring-industrial-accent/50 focus:border-industrial-accent bg-background/50"
+              className="w-full px-3 py-2 border border-border/50 rounded-lg focus:ring-2 focus-ring-industrial-accent/50 focus:border-industrial-accent bg-background/50"
             />
-            <button
-              type="button"
-              className="px-3 py-2 border-l-0 border border-border/50 rounded-r-lg bg-industrial-accent/10 text-industrial-accent hover:bg-industrial-accent/20 transition-colors"
-            >
-              <Search className="h-4 w-4" />
-            </button>
           </div>
 
           {/* Type Filter */}

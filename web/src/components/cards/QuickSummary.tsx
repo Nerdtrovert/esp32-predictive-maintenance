@@ -67,10 +67,15 @@ export const QuickSummary = () => {
     return (
       <Card className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {Array(4).fill(null).map((_, index) => (
-          <div key={index} className="flex items-center space-x-3 p-4 bg-card">
+          <div
+            key={index}
+            className="flex items-center space-x-3 p-4 bg-card"
+          >
             <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary mx-auto"></div>
             <div>
-              <h3 className="text-sm font-medium text-foreground/60">Loading...</h3>
+              <h3 className="text-sm font-medium text-foreground/60">
+                Loading...
+              </h3>
               <p className="text-lg font-semibold text-foreground">-</p>
             </div>
           </div>
@@ -85,11 +90,18 @@ export const QuickSummary = () => {
         {displayData.map((item: any, index) => {
           const IconComponent = IconMap[item.icon] || Activity;
           return (
-            <div key={index} className="flex items-center space-x-3 p-4 bg-card">
+            <div
+              key={index}
+              className="flex items-center space-x-3 p-4 bg-card"
+            >
               <IconComponent className="h-5 w-5 text-primary" />
               <div>
-                <h3 className="text-sm font-medium text-foreground/60">{item.label}</h3>
-                <p className="text-lg font-semibold text-destructive">Error loading data</p>
+                <h3 className="text-sm font-medium text-foreground/60">
+                  {item.label}
+                </h3>
+                <p className="text-lg font-semibold text-destructive">
+                  Error loading data
+                </p>
               </div>
             </div>
           );
@@ -103,11 +115,18 @@ export const QuickSummary = () => {
       {displayData.map((item: any, index) => {
         const IconComponent = IconMap[item.icon] || Activity;
         return (
-          <div key={index} className="flex items-center space-x-3 p-4 bg-card">
+          <div
+            key={index}
+            className="flex items-center space-x-3 p-4 bg-card"
+          >
             <IconComponent className="h-5 w-5 text-primary" />
             <div>
-              <h3 className="text-sm font-medium text-foreground/60">{item.label}</h3>
-              <p className="text-lg font-semibold text-foreground">{item.value}</p>
+              <h3 className="text-sm font-medium text-foreground/60">
+                {item.label}
+              </h3>
+              <p className="text-lg font-semibold text-foreground">
+                {item.value}
+              </p>
             </div>
           </div>
         );

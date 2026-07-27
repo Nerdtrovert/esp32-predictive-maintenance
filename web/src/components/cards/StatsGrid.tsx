@@ -115,7 +115,15 @@ export const StatsGrid = () => {
     <Card>
       <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-5">
         {displayStats.map((stat, index) => (
-          <KPIStat key={index} {...stat} />
+          <KPIStat
+            key={index}
+            title={stat.title}
+            value={stat.value}
+            trend={stat.trend}
+            change={stat.change}
+            icon={stat.icon}
+            color={stat.color}
+          />
         ))}
       </div>
     </Card>

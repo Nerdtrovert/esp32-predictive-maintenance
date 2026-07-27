@@ -35,7 +35,9 @@ export const MachineDetails = () => {
   if (loading) {
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold">Machine Details - Press Line Alpha</h1>
+        <h1 className="text-2xl font-bold">
+          Machine Details - Press Line Alpha
+        </h1>
 
         <div className="grid md:grid-cols-2 gap-6">
           <div className="flex-1 flex items-center justify-center">
@@ -52,7 +54,9 @@ export const MachineDetails = () => {
   if (error) {
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold">Machine Details - Press Line Alpha</h1>
+        <h1 className="text-2xl font-bold">
+          Machine Details - Press Line Alpha
+        </h1>
         <div className="text-center py-8 text-destructive">
           <p>{error}</p>
         </div>
@@ -70,19 +74,15 @@ export const MachineDetails = () => {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Machine Details - {machineData?.name || 'Press Line Alpha'}</h1>
+      <h1 className="text-2xl font-bold">
+        Machine Details - {machineData?.name || 'Press Line Alpha'}
+      </h1>
 
-      <MachineHeader
-        machine={machineData}
-      />
+      <MachineHeader machine={machineData} />
 
       <div className="grid md:grid-cols-2 gap-6">
-        <SensorCharts
-          machineId={machineId}
-        />
-        <HealthTrend
-          machineId={machineId}
-        />
+        <SensorCharts machineId={machineId} />
+        <HealthTrend machineId={machineId} />
       </div>
     </div>
   );

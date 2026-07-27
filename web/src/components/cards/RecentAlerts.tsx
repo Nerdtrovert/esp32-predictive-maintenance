@@ -67,7 +67,10 @@ export const RecentAlerts = () => {
       </CardHeader>
       <CardContent className="space-y-3">
         {alerts.map((alert) => (
-          <div key={alert.id} className="flex items-start space-x-3 p-3 rounded-lg border border-border/50">
+          <div
+            key={alert.id}
+            className="flex items-start space-x-3 p-3 rounded-lg border border-border/50"
+          >
             {alert.type === 'warning' && (
               <Zap className="h-4 w-4 text-industrial-warning flex-shrink-0" />
             )}

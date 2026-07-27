@@ -28,6 +28,7 @@ The project explores how condition-monitoring can run directly on low-cost embed
 - **Safety Tripping**: Triggers a 5 V safety isolation relay and alert LED when an anomaly is detected.
 - **Telemetry Sync**: Publishes diagnostics (temperatures, predicted temperature, anomaly score, status) to ThingsBoard.
 - **Remote Actuation Override**: Supports cloud-to-device RPC messages to control the relay remotely.
+- **Polished User Interface**: Added actual logo to sidebar, removed mock data from maintenance history (shows real API data or cached), cleared search button from navbar for cleaner look.
 
 ## Architecture
 

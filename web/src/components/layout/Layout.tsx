@@ -11,6 +11,9 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
         <main className="flex-1 p-6 overflow-auto">
           {children}
         </main>
+        <footer className="p-4 text-center text-sm text-muted-foreground border-t border-border">
+          Made by <a href="https://github.com/Nerdtrovert" className="underline hover:text-primary" target="_blank" rel="noopener noreferrer">Prajwal Navada G P</a>
+        </footer>
       </div>
     </div>
   );

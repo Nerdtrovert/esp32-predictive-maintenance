@@ -88,8 +88,7 @@ export const AlertsTimeline = ({ alerts }: AlertsTimelineProps) => {
                         : alert.type === 'info'
                           ? 'bg-industrial-info/10 text-industrial-info'
                           : 'bg-industrial-success/10 text-industrial-success'
-                  }`}
-                >
+                  }`}>
                   {alert.type.toUpperCase()}
                 </div>
                 <div className="h-2 w-2 rounded-full"
