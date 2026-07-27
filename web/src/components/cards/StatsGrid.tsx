@@ -9,20 +9,34 @@ export const StatsGrid = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchStats = async () => {
+    let active = true;
+    const fetchStats = async (isInitial = false) => {
+      if (isInitial) setLoading(true);
       try {
-        setLoading(true);
         const data = await apiService.getFactoryStats();
-        setStats(data);
+        if (active) {
+          setStats(data);
+        }
       } catch (err) {
-        setError('Failed to load statistics');
+        if (active && isInitial) {
+          setError('Failed to load statistics');
+        }
         console.error('Error fetching stats:', err);
       } finally {
-        setLoading(false);
+        if (active && isInitial) setLoading(false);
       }
     };
 
-    fetchStats();
+    fetchStats(true);
+
+    const interval = setInterval(() => {
+      fetchStats(false);
+    }, 2000);
+
+    return () => {
+      active = false;
+      clearInterval(interval);
+    };
   }, []);
 
   // Default data in case of loading or error
@@ -73,59 +87,53 @@ export const StatsGrid = () => {
 
   if (loading) {
     return (
-      <Card>
-        <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-5">
-          {Array(5).fill(null).map((_, index) => (
-            <KPIStat
-              key={index}
-              title="Loading..."
-              value="-"
-              trend="neutral"
-              change=""
-              icon="heart"
-              color="primary"
-            />
-          ))}
-        </div>
-      </Card>
+      <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-5">
+        {Array(5).fill(null).map((_, index) => (
+          <KPIStat
+            key={index}
+            title="Loading..."
+            value="-"
+            trend="neutral"
+            change=""
+            icon="heart"
+            color="primary"
+          />
+        ))}
+      </div>
     );
   }
 
   if (error) {
     return (
-      <Card>
-        <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-5">
-          {displayStats.map((stat, index) => (
-            <KPIStat
-              key={index}
-              title={stat.title}
-              value="Error"
-              trend="neutral"
-              change=""
-              icon={stat.icon}
-              color="destructive"
-            />
-          ))}
-        </div>
-      </Card>
-    );
-  }
-
-  return (
-    <Card>
       <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-5">
         {displayStats.map((stat, index) => (
           <KPIStat
             key={index}
             title={stat.title}
-            value={stat.value}
-            trend={stat.trend}
-            change={stat.change}
+            value="Error"
+            trend="neutral"
+            change=""
             icon={stat.icon}
-            color={stat.color}
+            color="destructive"
           />
         ))}
       </div>
-    </Card>
+    );
+  }
+
+  return (
+    <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-5">
+      {displayStats.map((stat, index) => (
+        <KPIStat
+          key={index}
+          title={stat.title}
+          value={stat.value}
+          trend={stat.trend}
+          change={stat.change}
+          icon={stat.icon}
+          color={stat.color}
+        />
+      ))}
+    </div>
   );
 };

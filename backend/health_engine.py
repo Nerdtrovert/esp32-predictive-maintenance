@@ -41,17 +41,31 @@ def machine_health_label(score: int) -> str:
 
 def build_machine_view(machine_id: int, name: str, sample: TelemetrySample) -> Dict[str, Any]:
     score = compute_health_score(sample)
+    
+    # Connection heartbeat timeout: if no new samples in 8 seconds, mark as offline/stale
+    is_stale = False
+    try:
+        sample_time = datetime.fromisoformat(sample.timestamp)
+        elapsed = (datetime.now() - sample_time).total_seconds()
+        if elapsed > 8.0:
+            is_stale = True
+    except Exception:
+        pass
+
+    status = "offline" if is_stale else derive_status(score)
+
     return {
         "id": machine_id,
         "name": name,
-        "status": derive_status(score),
-        "health": score,
+        "status": status,
+        "health": 0 if is_stale else score,
         "temperature": round(sample.temperature, 1),
         "vibration": estimate_vibration(sample),
         "predicted_temp": round(sample.predicted_temp, 1),
         "anomaly_score": round(sample.anomaly_score, 2),
-        "anomaly": sample.anomaly,
+        "anomaly": False if is_stale else sample.anomaly,
         "updated_at": sample.timestamp,
+        "is_stale": is_stale,
     }
 
 
@@ -96,7 +110,7 @@ def build_health_details(machine: Dict[str, Any]) -> Dict[str, Any]:
         "health_trend": trend,
         "hours": [f"{h:02d}:00" for h in hours],
         "indicators": {
-            "temperature_stability": "Good" if machine["temperature"] < 30 else "Warning",
+            "temperature_stability": "Good" if machine["temperature"] <= 28.0 else "Warning",
             "vibration_levels": (
                 "Good"
                 if machine["vibration"] < 3
@@ -104,7 +118,7 @@ def build_health_details(machine: Dict[str, Any]) -> Dict[str, Any]:
                 if machine["vibration"] < 6
                 else "Critical"
             ),
-            "power_efficiency": "Optimal" if machine["temperature"] < 30 else "Suboptimal",
+            "power_efficiency": "Optimal" if machine["temperature"] <= 28.0 else "Suboptimal",
             "maintenance_status": machine_health_label(score),
         },
         "updated_at": datetime.now().isoformat(),

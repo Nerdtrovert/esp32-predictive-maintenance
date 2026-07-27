@@ -48,9 +48,9 @@ export const ReportsGrid = ({ reports, onReportSelect, selectedReportId }: Repor
             <div
               key={report.id}
               onClick={() => onReportSelect(report.id)}
-              className={`cursor-pointer p-4 rounded-lg border border-border/50 hover:bg-accent/5 transition-colors ${
+              className={`cursor-pointer p-4 rounded-xl border border-border/50 hover:bg-accent/5 transition-all duration-200 ${
                 selectedReportId === report.id
-                  ? 'bg-industrial-accent/5 border-l-4 border-industrial-accent'
+                  ? 'bg-primary/5 border-l-4 border-primary border-y-primary/20 border-r-primary/20'
                   : ''
               }`}
             >

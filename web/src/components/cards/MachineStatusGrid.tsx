@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card } from '../ui/Card';
+import { Cpu } from 'lucide-react';
 import { MachineStatusCard } from './MachineStatusCard';
 import apiService from '../../services/apiService';
 
@@ -9,50 +9,61 @@ export const MachineStatusGrid = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchMachines = async () => {
+    let active = true;
+    const fetchMachines = async (isInitial = false) => {
+      if (isInitial) setLoading(true);
       try {
-        setLoading(true);
         const data = await apiService.getFactoryMachines();
-        setMachines(data);
+        if (active) {
+          setMachines(data);
+        }
       } catch (err) {
-        setError('Failed to load machine data');
+        if (active && isInitial) {
+          setError('Failed to load machine data');
+        }
         console.error('Error fetching machines:', err);
       } finally {
-        setLoading(false);
+        if (active && isInitial) setLoading(false);
       }
     };
 
-    fetchMachines();
+    fetchMachines(true);
+
+    const interval = setInterval(() => {
+      fetchMachines(false);
+    }, 2000);
+
+    return () => {
+      active = false;
+      clearInterval(interval);
+    };
   }, []);
 
   if (loading) {
     return (
-      <Card>
-        <div className="text-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-industrial-accent"></div>
-          <p className="mt-2 text-muted-foreground">Loading machine status...</p>
-        </div>
-      </Card>
+      <div className="grid md:grid-cols-2 gap-4">
+        {Array(4).fill(null).map((_, i) => (
+          <div key={i} className="p-5 border border-border rounded-xl bg-card h-48 flex items-center justify-center">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+          </div>
+        ))}
+      </div>
     );
   }
 
   if (error) {
     return (
-      <Card>
-        <div className="text-center py-8 text-destructive">
-          <p>{error}</p>
-        </div>
-      </Card>
+      <div className="p-6 border border-destructive/20 bg-destructive/5 rounded-xl text-center text-destructive">
+        {error}
+      </div>
     );
   }
 
   return (
-    <Card>
-      <div className="space-y-4">
-        {machines.map(machine => (
-          <MachineStatusCard key={machine.id} {...machine} />
-        ))}
-      </div>
-    </Card>
+    <div className="grid md:grid-cols-2 gap-4">
+      {machines.map(machine => (
+        <MachineStatusCard key={machine.id} {...machine} />
+      ))}
+    </div>
   );
 };

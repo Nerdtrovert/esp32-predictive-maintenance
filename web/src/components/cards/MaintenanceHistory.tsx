@@ -14,21 +14,25 @@ export const MaintenanceHistory = () => {
   });
   const [showDropdown, setShowDropdown] = useState<string | null>(null);
 
-  const fetchMaintenanceHistory = async () => {
+  const fetchMaintenanceHistory = async (isInitial = false) => {
     try {
-      setLoading(true);
-      setError(null);
+      if (isInitial) {
+        setLoading(true);
+        setError(null);
+      }
       const data = await apiService.getMaintenanceHistory();
       setMaintenanceRecords(data);
     } catch (err) {
-      setError('Unable to connect to hardware. Showing last known data.');
+      if (isInitial) {
+        setError('Unable to connect to hardware. Showing last known data.');
+      }
       console.error('Error fetching maintenance history:', err);
       // Try to load past data from localStorage
       try {
         const savedData = localStorage.getItem('maintenanceHistory');
         if (savedData) {
           setMaintenanceRecords(JSON.parse(savedData));
-          setLoading(false);
+          if (isInitial) setLoading(false);
           return;
         }
       } catch (e) {
@@ -36,12 +40,18 @@ export const MaintenanceHistory = () => {
       }
       setMaintenanceRecords([]); // Fallback to empty array
     } finally {
-      setLoading(false);
+      if (isInitial) setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchMaintenanceHistory();
+    fetchMaintenanceHistory(true);
+
+    const interval = setInterval(() => {
+      fetchMaintenanceHistory(false);
+    }, 2000);
+
+    return () => clearInterval(interval);
   }, []);
 
   // No mock data - rely solely on API or cached data

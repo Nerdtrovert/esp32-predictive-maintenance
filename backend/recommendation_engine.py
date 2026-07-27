@@ -8,14 +8,14 @@ def build_recommendations(machines: List[Dict[str, Any]]) -> List[Dict[str, Any]
     rec_id = 1
 
     for machine in machines:
-        if machine["temperature"] >= 32:
+        if machine["temperature"] >= 28.0:
             recommendations.append(
                 {
                     "id": rec_id,
                     "title": "Adjust Temperature Setpoint",
                     "description": (
                         f"{machine['name']} is running at {machine['temperature']}°C. "
-                        "Lower setpoint by 1-2°C to reduce thermal stress."
+                        "Lower setpoint to reduce thermal stress."
                     ),
                     "priority": "high",
                     "icon": "trending-up",
@@ -40,13 +40,14 @@ def build_recommendations(machines: List[Dict[str, Any]]) -> List[Dict[str, Any]
             )
             rec_id += 1
 
-        if machine["anomaly"]:
+        if machine["anomaly"] or machine["anomaly_score"] >= 30:
+            status = "Severe Anomaly" if machine["anomaly_score"] >= 70 else "Anomaly"
             recommendations.append(
                 {
                     "id": rec_id,
                     "title": "Run Immediate Diagnostic",
                     "description": (
-                        f"Anomaly score {machine['anomaly_score']} detected on {machine['name']}. "
+                        f"{status} detected on {machine['name']}. "
                         "Run manual inspection and compare with baseline telemetry."
                     ),
                     "priority": "high",
@@ -90,7 +91,7 @@ def build_ai_analysis(machines: List[Dict[str, Any]]) -> Dict[str, str]:
             "to reduce avoidable start-stop losses."
         ),
         "maintenance_forecast": (
-            f"{highest_risk['name']} has the highest anomaly signal ({highest_risk['anomaly_score']:.2f}). "
+            f"{highest_risk['name']} has the highest anomaly signal ({'Severe Anomaly' if highest_risk['anomaly_score'] >= 70 else 'Anomaly' if highest_risk['anomaly_score'] >= 30 else 'Normal'}). "
             "Plan predictive inspection in the next maintenance window."
         ),
         "overall_trend": (
@@ -110,7 +111,7 @@ def build_maintenance_recommendations(machines: List[Dict[str, Any]]) -> List[Di
                 "id": rec_id,
                 "title": f"Service {machine['name']}",
                 "description": (
-                    f"Health score {machine['health']} with anomaly score {machine['anomaly_score']:.2f}. "
+                    f"Health score {machine['health']} with {'Severe Anomaly' if machine['anomaly_score'] >= 70 else 'Anomaly' if machine['anomaly_score'] >= 30 else 'Normal'} status. "
                     "Perform lubrication, alignment check, and thermal calibration."
                 ),
                 "priority": "high" if machine["health"] < 70 else "medium",

@@ -22,13 +22,13 @@ export const Sidebar = () => {
         </div>
       </div>
 
-      <nav className="flex-1 space-y-1">
+      <nav className="flex-1 space-y-1 py-4">
         <NavLink
           to="/"
           end
           className={({ isActive }) => `
-            flex items-center px-3 py-2 rounded-md text-sm font-medium
-            ${isActive ? 'bg-primary/10 text-primary' : 'hover:bg-accent/5 text-foreground/80 hover:text-foreground'}
+            flex items-center px-4 py-2.5 border-l-2 text-sm font-medium transition-all duration-200
+            ${isActive ? 'border-primary bg-primary/5 text-primary font-semibold' : 'border-transparent hover:bg-accent/5 text-foreground/80 hover:text-foreground'}
           `}
         >
           <LayoutDashboard className="mr-3 h-4 w-4 flex-shrink-0" />
@@ -39,8 +39,8 @@ export const Sidebar = () => {
           to="/machine/1"
           end
           className={({ isActive }) => `
-            flex items-center px-3 py-2 rounded-md text-sm font-medium
-            ${isActive ? 'bg-primary/10 text-primary' : 'hover:bg-accent/5 text-foreground/80 hover:text-foreground'}
+            flex items-center px-4 py-2.5 border-l-2 text-sm font-medium transition-all duration-200
+            ${isActive ? 'border-primary bg-primary/5 text-primary font-semibold' : 'border-transparent hover:bg-accent/5 text-foreground/80 hover:text-foreground'}
           `}
         >
           <Cpu className="mr-3 h-4 w-4 flex-shrink-0" />
@@ -51,8 +51,8 @@ export const Sidebar = () => {
           to="/ai-insights"
           end
           className={({ isActive }) => `
-            flex items-center px-3 py-2 rounded-md text-sm font-medium
-            ${isActive ? 'bg-primary/10 text-primary' : 'hover:bg-accent/5 text-foreground/80 hover:text-foreground'}
+            flex items-center px-4 py-2.5 border-l-2 text-sm font-medium transition-all duration-200
+            ${isActive ? 'border-primary bg-primary/5 text-primary font-semibold' : 'border-transparent hover:bg-accent/5 text-foreground/80 hover:text-foreground'}
           `}
         >
           <TrendingUp className="mr-3 h-4 w-4 flex-shrink-0" />
@@ -63,8 +63,8 @@ export const Sidebar = () => {
           to="/alerts"
           end
           className={({ isActive }) => `
-            flex items-center px-3 py-2 rounded-md text-sm font-medium
-            ${isActive ? 'bg-primary/10 text-primary' : 'hover:bg-accent/5 text-foreground/80 hover:text-foreground'}
+            flex items-center px-4 py-2.5 border-l-2 text-sm font-medium transition-all duration-200
+            ${isActive ? 'border-primary bg-primary/5 text-primary font-semibold' : 'border-transparent hover:bg-accent/5 text-foreground/80 hover:text-foreground'}
           `}
         >
           <Bell className="mr-3 h-4 w-4 flex-shrink-0" />
@@ -75,8 +75,8 @@ export const Sidebar = () => {
           to="/maintenance"
           end
           className={({ isActive }) => `
-            flex items-center px-3 py-2 rounded-md text-sm font-medium
-            ${isActive ? 'bg-primary/10 text-primary' : 'hover:bg-accent/5 text-foreground/80 hover:text-foreground'}
+            flex items-center px-4 py-2.5 border-l-2 text-sm font-medium transition-all duration-200
+            ${isActive ? 'border-primary bg-primary/5 text-primary font-semibold' : 'border-transparent hover:bg-accent/5 text-foreground/80 hover:text-foreground'}
           `}
         >
           <Wrench className="mr-3 h-4 w-4 flex-shrink-0" />
@@ -87,8 +87,8 @@ export const Sidebar = () => {
           to="/reports"
           end
           className={({ isActive }) => `
-            flex items-center px-3 py-2 rounded-md text-sm font-medium
-            ${isActive ? 'bg-primary/10 text-primary' : 'hover:bg-accent/5 text-foreground/80 hover:text-foreground'}
+            flex items-center px-4 py-2.5 border-l-2 text-sm font-medium transition-all duration-200
+            ${isActive ? 'border-primary bg-primary/5 text-primary font-semibold' : 'border-transparent hover:bg-accent/5 text-foreground/80 hover:text-foreground'}
           `}
         >
           <FileText className="mr-3 h-4 w-4 flex-shrink-0" />
@@ -96,11 +96,14 @@ export const Sidebar = () => {
         </NavLink>
       </nav>
 
-      <div className="mt-auto p-4 border-t border-border flex-shrink-0">
+      <div className="mt-auto h-[60px] flex items-center border-t border-border flex-shrink-0">
         <NavLink
           to="/settings"
           end
-          className="flex items-center px-3 py-2 rounded-md text-sm font-medium hover:bg-accent/5 text-foreground/80 hover:text-foreground"
+          className={({ isActive }) => `
+            flex items-center w-full px-4 h-full border-l-2 text-sm font-medium transition-all duration-200
+            ${isActive ? 'border-primary bg-primary/5 text-primary font-semibold' : 'border-transparent hover:bg-accent/5 text-foreground/80 hover:text-foreground'}
+          `}
         >
           <Settings className="mr-3 h-4 w-4 flex-shrink-0" />
           Settings

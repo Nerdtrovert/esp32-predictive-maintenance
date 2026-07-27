@@ -11,10 +11,12 @@ export const Reports = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchReports = async () => {
+  const fetchReports = async (isInitial = false) => {
     try {
-      setLoading(true);
-      setError(null);
+      if (isInitial) {
+        setLoading(true);
+        setError(null);
+      }
       const data = await apiService.getReports();
       setReports(data);
       // Select first report by default if available
@@ -22,16 +24,32 @@ export const Reports = () => {
         setSelectedReportId(data[0].id);
       }
     } catch (err) {
-      setError('Failed to load reports');
+      if (isInitial) {
+        setError('Failed to load reports');
+      }
       console.error('Error fetching reports:', err);
     } finally {
-      setLoading(false);
+      if (isInitial) {
+        setLoading(false);
+      }
     }
   };
 
   useEffect(() => {
-    fetchReports();
-  }, []);
+    let active = true;
+    fetchReports(true);
+
+    const interval = setInterval(() => {
+      if (active) {
+        fetchReports(false);
+      }
+    }, 2000);
+
+    return () => {
+      active = false;
+      clearInterval(interval);
+    };
+  }, [selectedReportId]);
 
   // Enhanced mock data for reports
   const mockReports = [

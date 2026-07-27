@@ -12,13 +12,13 @@ const Card = React.forwardRef<
   return (
     <div
       className={cn(
-        'rounded-lg border bg-card text-card-foreground shadow-sm ring-offset-background translucent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&>svg~*]:pl-4',
+        'rounded-xl border bg-card text-card-foreground shadow-sm ring-offset-background translucent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&>svg~*]:pl-4',
         className
       )}
       ref={ref}
       {...propsWithoutClassName}
     >
-      <div className="p-6">{props.children}</div>
+      {props.children}
     </div>
   );
 });

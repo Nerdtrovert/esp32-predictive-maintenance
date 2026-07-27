@@ -9,11 +9,36 @@ export const MachineHeader = ({ machine }: { machine: any }) => {
     temperature: 0,
     vibration: 0,
     predicted_temp: 0,
-    anomaly_score: 0
+    anomaly_score: 0,
+    anomaly: false
   };
 
+  const getAnomalyStatus = (score: number, isAnomaly: boolean) => {
+    if (isAnomaly || score >= 75) {
+      return {
+        label: 'Severe Anomaly',
+        color: 'text-industrial-danger',
+        iconColor: 'text-industrial-danger'
+      };
+    }
+    if (score >= 60) {
+      return {
+        label: 'Anomaly',
+        color: 'text-industrial-warning',
+        iconColor: 'text-industrial-warning'
+      };
+    }
+    return {
+      label: 'Normal',
+      color: 'text-industrial-success',
+      iconColor: 'text-industrial-success'
+    };
+  };
+
+  const anomalyStatus = getAnomalyStatus(data.anomaly_score, data.anomaly);
+
   return (
-    <Card className="space-y-4">
+    <Card className="p-6 space-y-4">
       <div className="flex items-center justify-between">
         <div className="space-y-2">
           <h2 className="text-xl font-semibold">{data.name}</h2>
@@ -73,11 +98,11 @@ export const MachineHeader = ({ machine }: { machine: any }) => {
 
         <div className="text-center p-3 bg-card rounded-lg">
           <div className="flex items-center justify-center mb-2">
-            <Gauge className="h-5 w-5 text-industrial-success" />
+            <Gauge className={`h-5 w-5 ${anomalyStatus.iconColor}`} />
           </div>
           <div className="space-y-1">
-            <p className="text-xs text-muted-foreground">Anomaly Score</p>
-            <p className="text-lg font-semibold">{data.anomaly_score}</p>
+            <p className="text-xs text-muted-foreground">Anomaly Status</p>
+            <p className={`text-lg font-semibold ${anomalyStatus.color}`}>{anomalyStatus.label}</p>
           </div>
         </div>
       </div>

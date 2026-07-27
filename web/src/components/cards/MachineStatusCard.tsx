@@ -58,38 +58,66 @@ export const MachineStatusCard = ({
     }
   };
 
-  const { icon: StatusIcon, color, bg, label } = getStatusConfig();
+  const getHealthLabel = (h: number) => {
+    if (h === 0 || status === 'offline') return { text: 'Disconnected', color: 'text-muted-foreground', dot: '⚪' };
+    if (h >= 85) return { text: 'Excellent', color: 'text-industrial-success', dot: '🟢' };
+    if (h >= 70) return { text: 'Healthy', color: 'text-industrial-success', dot: '🟢' };
+    if (h >= 50) return { text: 'Needs Attention', color: 'text-industrial-warning', dot: '🟡' };
+    return { text: 'Critical', color: 'text-industrial-danger', dot: '🔴' };
+  };
+
+  const { icon: StatusIcon, color, label } = getStatusConfig();
+  const healthConfig = getHealthLabel(health);
 
   return (
-    <div className="p-4 border rounded-lg">
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="font-medium">{name}</h3>
-        <div className="flex items-center space-x-2">
-          <StatusIcon className={`h-4 w-4 ${color}`} />
-          <span className="text-xs">{label}</span>
+    <div className="p-4 border border-border rounded-xl bg-card text-card-foreground shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between h-[120px]">
+      <div>
+        <div className="flex items-center justify-between mb-2.5 border-b border-border/50 pb-1.5">
+          <h3 className="font-semibold text-sm text-foreground">{name}</h3>
+          <div className="flex items-center space-x-1.5">
+            <StatusIcon className={`h-3.5 w-3.5 ${color}`} />
+            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{label}</span>
+          </div>
         </div>
-      </div>
-      
-      <div className="grid gap-2 text-sm">
-        <div className="flex justify-between">
-          <span>Health:</span>
-          <span className="font-medium">{health}%</span>
+        
+        <div className="space-y-2.5 text-sm">
+          {/* Health Row with custom label */}
+          <div>
+            <div className="flex justify-between items-baseline mb-1">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Health</span>
+              <div className="flex flex-col items-end -mt-2">
+                <span className={`text-sm font-bold ${healthConfig.color}`}>{health}%</span>
+                <span className="text-[9px] text-muted-foreground font-semibold flex items-center space-x-1">
+                  <span>{healthConfig.dot}</span>
+                  <span>{healthConfig.text}</span>
+                </span>
+              </div>
+            </div>
+            <div className="h-1.5 bg-muted/30 rounded-full overflow-hidden">
+              <div 
+                className={`h-full transition-all duration-500 ${
+                  health === 0 || status === 'offline' ? 'bg-muted-foreground/30' :
+                  health >= 85 ? 'bg-industrial-success' :
+                  health >= 70 ? 'bg-industrial-success/85' :
+                  health >= 50 ? 'bg-industrial-warning' : 'bg-industrial-danger'
+                }`} 
+                style={{ width: `${health}%` }}
+              ></div>
+            </div>
+          </div>
+
+          {/* Temperature & Vibration Inline Row */}
+          <div className="flex items-center justify-between text-xs text-muted-foreground pt-0.5">
+            <div className="flex items-center space-x-1.5">
+              <Thermometer className="h-3.5 w-3.5 text-industrial-warning flex-shrink-0" />
+              <span>Temp: <strong className="text-foreground font-semibold">{temperature.toFixed(1)}°C</strong></span>
+            </div>
+            <div className="flex items-center space-x-1.5">
+              <Activity className="h-3.5 w-3.5 text-industrial-danger flex-shrink-0" />
+              <span>Vibe: <strong className="text-foreground font-semibold">{vibration.toFixed(2)} mm/s</strong></span>
+            </div>
+          </div>
         </div>
-        <div className="flex justify-between">
-          <span>Temp:</span>
-          <span className="font-medium">{temperature}°C</span>
-        </div>
-        <div className="flex justify-between">
-          <span>Vibration:</span>
-          <span className="font-medium">{vibration} mm/s</span>
-        </div>
-      </div>
-      
-      <div className="h-2 bg-muted/5 rounded-full mt-3 overflow-hidden">
-        <div 
-          className={`${color.replace('text-', 'bg-')} h-full transition-all duration-500`} 
-          style={{ width: `${health}%` }}
-        ></div>
       </div>
     </div>
   );

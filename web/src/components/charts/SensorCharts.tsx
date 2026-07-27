@@ -36,20 +36,34 @@ export const SensorCharts = ({ machineId = 1 }: { machineId?: number }) => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchSensorData = async () => {
+    let active = true;
+    const fetchSensorData = async (isInitial = false) => {
+      if (isInitial) setLoading(true);
       try {
-        setLoading(true);
         const data = await apiService.getMachineSensorData(machineId);
-        setSensorData(data);
+        if (active) {
+          setSensorData(data);
+        }
       } catch (err) {
-        setError('Failed to load sensor data');
+        if (active && isInitial) {
+          setError('Failed to load sensor data');
+        }
         console.error('Error fetching sensor data:', err);
       } finally {
-        setLoading(false);
+        if (active && isInitial) setLoading(false);
       }
     };
 
-    fetchSensorData();
+    fetchSensorData(true);
+
+    const interval = setInterval(() => {
+      fetchSensorData(false);
+    }, 2000);
+
+    return () => {
+      active = false;
+      clearInterval(interval);
+    };
   }, [machineId]);
 
   const temperatureSeries = normalizeSeries(sensorData?.temperature);
@@ -103,26 +117,28 @@ export const SensorCharts = ({ machineId = 1 }: { machineId?: number }) => {
         <div className="grid md:grid-cols-3 gap-4">
           <div className="space-y-3">
             <h3 className="text-sm font-medium text-foreground/60">Temperature</h3>
-            <div className="h-24">
-              <div className="border border-border/50 rounded-lg p-4 bg-gradient-to-b from-industrial-blue/5 to-transparent">
-                <div className="flex h-full items-center justify-center">
+            <div className="h-32">
+              <div className="border border-border/50 rounded-lg p-3 bg-gradient-to-b from-industrial-blue/5 to-transparent h-full">
+                <div className="flex flex-col h-full justify-between w-full">
                   {temperatureSeries.length > 0 ? (
                     <>
-                      <svg width="100%" height="100%" className="block">
-                        <polyline
-                          points={temperatureSeries
-                            .map((point: any, index: number) => {
-                              const x = (index / (temperatureSeries.length - 1)) * 100;
-                              const y = 100 - ((point.y - 65) / 15) * 100; // Normalize 65-80 range
-                              return `${x}%,${y}%`;
-                            })
-                            .join(' ')}
-                          fill="none"
-                          stroke="industrial-warning"
-                          stroke-width="2"
-                        />
-                      </svg>
-                      <div className="mt-2 text-center">
+                      <div className="h-14 w-full relative">
+                        <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-full block">
+                          <polyline
+                            points={temperatureSeries
+                              .map((point: any, index: number) => {
+                                const x = (index / (temperatureSeries.length - 1)) * 100;
+                                const y = 100 - ((point.y - 25) / 15) * 100; // Normalize 25-40 range
+                                return `${x},${y}`;
+                              })
+                              .join(' ')}
+                            fill="none"
+                            stroke="#f59e0b"
+                            strokeWidth="3"
+                          />
+                        </svg>
+                      </div>
+                      <div className="text-center mt-1">
                         <div className="text-lg font-semibold text-industrial-warning">
                           {lastTemperature?.toFixed(1)}°C
                         </div>
@@ -132,7 +148,7 @@ export const SensorCharts = ({ machineId = 1 }: { machineId?: number }) => {
                       </div>
                     </>
                   ) : (
-                    <div className="text-center text-industrial-warning/50">
+                    <div className="text-center text-industrial-warning/50 m-auto">
                       <Thermometer className="h-6 w-6 mx-auto mb-2" />
                       <div>72.3°C</div>
                       <div className="text-xs text-muted-foreground">Normal Range</div>
@@ -145,26 +161,28 @@ export const SensorCharts = ({ machineId = 1 }: { machineId?: number }) => {
 
           <div className="space-y-3">
             <h3 className="text-sm font-medium text-foreground/60">Vibration</h3>
-            <div className="h-24">
-              <div className="border border-border/50 rounded-lg p-4 bg-gradient-to-b from-industrial-warning/5 to-transparent">
-                <div className="flex h-full items-center justify-center">
+            <div className="h-32">
+              <div className="border border-border/50 rounded-lg p-3 bg-gradient-to-b from-industrial-warning/5 to-transparent h-full">
+                <div className="flex flex-col h-full justify-between w-full">
                   {vibrationSeries.length > 0 ? (
                     <>
-                      <svg width="100%" height="100%" className="block">
-                        <polyline
-                          points={vibrationSeries
-                            .map((point: any, index: number) => {
-                              const x = (index / (vibrationSeries.length - 1)) * 100;
-                              const y = 100 - ((point.y - 1.5) / 3) * 100; // Normalize 1.5-4.5 range
-                              return `${x}%,${y}%`;
-                            })
-                            .join(' ')}
-                          fill="none"
-                          stroke="industrial-danger"
-                          stroke-width="2"
-                        />
-                      </svg>
-                      <div className="mt-2 text-center">
+                      <div className="h-14 w-full relative">
+                        <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-full block">
+                          <polyline
+                            points={vibrationSeries
+                              .map((point: any, index: number) => {
+                                const x = (index / (vibrationSeries.length - 1)) * 100;
+                                const y = 100 - ((point.y - 1.0) / 8) * 100; // Normalize 1-9 range
+                                return `${x},${y}`;
+                              })
+                              .join(' ')}
+                            fill="none"
+                            stroke="#ef4444"
+                            strokeWidth="3"
+                          />
+                        </svg>
+                      </div>
+                      <div className="text-center mt-1">
                         <div className="text-lg font-semibold text-industrial-danger">
                           {lastVibration?.toFixed(1)} mm/s
                         </div>
@@ -174,7 +192,7 @@ export const SensorCharts = ({ machineId = 1 }: { machineId?: number }) => {
                       </div>
                     </>
                   ) : (
-                    <div className="text-center text-industrial-warning/50">
+                    <div className="text-center text-industrial-warning/50 m-auto">
                       <Activity className="h-6 w-6 mx-auto mb-2" />
                       <div>2.1 mm/s</div>
                       <div className="text-xs text-muted-foreground">Acceptable</div>
@@ -187,26 +205,28 @@ export const SensorCharts = ({ machineId = 1 }: { machineId?: number }) => {
 
           <div className="space-y-3">
             <h3 className="text-sm font-medium text-foreground/60">Power Consumption</h3>
-            <div className="h-24">
-              <div className="border border-border/50 rounded-lg p-4 bg-gradient-to-b from-industrial-accent/5 to-transparent">
-                <div className="flex h-full items-center justify-center">
+            <div className="h-32">
+              <div className="border border-border/50 rounded-lg p-3 bg-gradient-to-b from-industrial-accent/5 to-transparent h-full">
+                <div className="flex flex-col h-full justify-between w-full">
                   {powerSeries.length > 0 ? (
                     <>
-                      <svg width="100%" height="100%" className="block">
-                        <polyline
-                          points={powerSeries
-                            .map((point: any, index: number) => {
-                              const x = (index / (powerSeries.length - 1)) * 100;
-                              const y = 100 - ((point.y - 35) / 20) * 100; // Normalize 35-55 range
-                              return `${x}%,${y}%`;
-                            })
-                            .join(' ')}
-                          fill="none"
-                          stroke="industrial-accent"
-                          stroke-width="2"
-                        />
-                      </svg>
-                      <div className="mt-2 text-center">
+                      <div className="h-14 w-full relative">
+                        <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-full block">
+                          <polyline
+                            points={powerSeries
+                              .map((point: any, index: number) => {
+                                const x = (index / (powerSeries.length - 1)) * 100;
+                                const y = 100 - ((point.y - 35) / 25) * 100; // Normalize 35-60 range
+                                return `${x},${y}`;
+                              })
+                              .join(' ')}
+                            fill="none"
+                            stroke="#0ea5e9"
+                            strokeWidth="3"
+                          />
+                        </svg>
+                      </div>
+                      <div className="text-center mt-1">
                         <div className="text-lg font-semibold text-industrial-accent">
                           {lastPower?.toFixed(1)} kW
                         </div>
@@ -216,7 +236,7 @@ export const SensorCharts = ({ machineId = 1 }: { machineId?: number }) => {
                       </div>
                     </>
                   ) : (
-                    <div className="text-center text-industrial-accent/50">
+                    <div className="text-center text-industrial-accent/50 m-auto">
                       <Zap className="h-6 w-6 mx-auto mb-2" />
                       <div>45.2 kW</div>
                       <div className="text-xs text-muted-foreground">Stable</div>
@@ -230,60 +250,62 @@ export const SensorCharts = ({ machineId = 1 }: { machineId?: number }) => {
 
         <div className="mt-4 pt-4 border-t border-border/50">
           <div className="flex items-center space-x-3 mb-3">
-            <LineChart className="h-4 w-4 text-industrial-primary" />
+            <LineChart className="h-4 w-4 text-primary" />
             <h3 className="text-sm font-medium text-foreground/60">Combined View</h3>
           </div>
-          <div className="h-32 border border-border/50 rounded-lg p-4">
-            <div className="flex h-full items-center justify-center">
+          <div className="h-40 border border-border/50 rounded-lg p-3">
+            <div className="flex flex-col h-full justify-between w-full">
               {temperatureSeries.length > 0 && vibrationSeries.length > 0 && powerSeries.length > 0 ? (
                 <>
-                  <svg width="100%" height="100%" className="block">
-                    {/* Temperature line */}
-                    <polyline
-                      points={temperatureSeries
-                        .map((point: any, index: number) => {
-                          const x = (index / (temperatureSeries.length - 1)) * 100;
-                          const y = 100 - ((point.y - 65) / 15) * 100;
-                          return `${x}%,${y}%`;
-                        })
-                        .join(' ')}
-                      fill="none"
-                      stroke="industrial-warning"
-                      stroke-width="2"
-                    />
-                    {/* Vibration line */}
-                    <polyline
-                      points={vibrationSeries
-                        .map((point: any, index: number) => {
-                          const x = (index / (vibrationSeries.length - 1)) * 100;
-                          const y = 100 - ((point.y - 1.5) / 3) * 100;
-                          return `${x}%,${y}%`;
-                        })
-                        .join(' ')}
-                      fill="none"
-                      stroke="industrial-danger"
-                      stroke-width="2"
-                    />
-                    {/* Power line */}
-                    <polyline
-                      points={powerSeries
-                        .map((point: any, index: number) => {
-                          const x = (index / (powerSeries.length - 1)) * 100;
-                          const y = 100 - ((point.y - 35) / 20) * 100;
-                          return `${x}%,${y}%`;
-                        })
-                        .join(' ')}
-                      fill="none"
-                      stroke="industrial-accent"
-                      stroke-width="2"
-                    />
-                  </svg>
-                  <div className="mt-2 text-center text-xs text-muted-foreground">
+                  <div className="h-24 w-full relative">
+                    <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-full block">
+                      {/* Temperature line */}
+                      <polyline
+                        points={temperatureSeries
+                          .map((point: any, index: number) => {
+                            const x = (index / (temperatureSeries.length - 1)) * 100;
+                            const y = 100 - ((point.y - 25) / 15) * 100;
+                            return `${x},${y}`;
+                          })
+                          .join(' ')}
+                        fill="none"
+                        stroke="#f59e0b"
+                        strokeWidth="2"
+                      />
+                      {/* Vibration line */}
+                      <polyline
+                        points={vibrationSeries
+                          .map((point: any, index: number) => {
+                            const x = (index / (vibrationSeries.length - 1)) * 100;
+                            const y = 100 - ((point.y - 1.0) / 8) * 100;
+                            return `${x},${y}`;
+                          })
+                          .join(' ')}
+                        fill="none"
+                        stroke="#ef4444"
+                        strokeWidth="2"
+                      />
+                      {/* Power line */}
+                      <polyline
+                        points={powerSeries
+                          .map((point: any, index: number) => {
+                            const x = (index / (powerSeries.length - 1)) * 100;
+                            const y = 100 - ((point.y - 35) / 25) * 100;
+                            return `${x},${y}`;
+                          })
+                          .join(' ')}
+                        fill="none"
+                        stroke="#0ea5e9"
+                        strokeWidth="2"
+                      />
+                    </svg>
+                  </div>
+                  <div className="text-center mt-2 text-xs text-muted-foreground">
                     Multi-sensor visualization
                   </div>
                 </>
               ) : (
-                <div className="text-center text-muted-foreground">
+                <div className="text-center text-muted-foreground m-auto">
                   Chart visualization would appear here<br />
                   <span className="text-xs">(In production: Recharts/Victory/ApexCharts)</span>
                 </div>

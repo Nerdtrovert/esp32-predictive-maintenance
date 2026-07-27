@@ -14,20 +14,34 @@ export const QuickSummary = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchSummary = async () => {
+    let active = true;
+    const fetchSummary = async (isInitial = false) => {
+      if (isInitial) setLoading(true);
       try {
-        setLoading(true);
         const data = await apiService.getQuickSummary();
-        setSummary(data);
+        if (active) {
+          setSummary(data);
+        }
       } catch (err) {
-        setError('Failed to load summary');
+        if (active && isInitial) {
+          setError('Failed to load summary');
+        }
         console.error('Error fetching summary:', err);
       } finally {
-        setLoading(false);
+        if (active && isInitial) setLoading(false);
       }
     };
 
-    fetchSummary();
+    fetchSummary(true);
+
+    const interval = setInterval(() => {
+      fetchSummary(false);
+    }, 2000);
+
+    return () => {
+      active = false;
+      clearInterval(interval);
+    };
   }, []);
 
   // Default data in case of loading or error
@@ -65,7 +79,7 @@ export const QuickSummary = () => {
 
   if (loading) {
     return (
-      <Card className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <Card className="p-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {Array(4).fill(null).map((_, index) => (
           <div
             key={index}
@@ -86,7 +100,7 @@ export const QuickSummary = () => {
 
   if (error) {
     return (
-      <Card className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <Card className="p-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {displayData.map((item: any, index) => {
           const IconComponent = IconMap[item.icon] || Activity;
           return (
@@ -111,7 +125,7 @@ export const QuickSummary = () => {
   }
 
   return (
-    <Card className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <Card className="p-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {displayData.map((item: any, index) => {
         const IconComponent = IconMap[item.icon] || Activity;
         return (

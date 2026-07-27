@@ -13,26 +13,38 @@ export const AIInsights = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchData = async () => {
+    let active = true;
+    const fetchData = async (isInitial = false) => {
+      if (isInitial) setLoading(true);
       try {
-        setLoading(true);
-
-        // Fetch AI analysis
-        const analysis = await apiService.getAIAnalysis();
-        setAiAnalysis(analysis);
-
-        // Fetch AI recommendations
-        const recommendations = await apiService.getAIRecommendations();
-        setAiRecommendations(recommendations);
+        const [analysis, recommendations] = await Promise.all([
+          apiService.getAIAnalysis(),
+          apiService.getAIRecommendations()
+        ]);
+        if (active) {
+          setAiAnalysis(analysis);
+          setAiRecommendations(recommendations);
+        }
       } catch (err) {
-        setError('Failed to load AI insights');
+        if (active && isInitial) {
+          setError('Failed to load AI insights');
+        }
         console.error('Error fetching AI insights:', err);
       } finally {
-        setLoading(false);
+        if (active && isInitial) setLoading(false);
       }
     };
 
-    fetchData();
+    fetchData(true);
+
+    const interval = setInterval(() => {
+      fetchData(false);
+    }, 2000);
+
+    return () => {
+      active = false;
+      clearInterval(interval);
+    };
   }, []);
 
   // Default data for fallback

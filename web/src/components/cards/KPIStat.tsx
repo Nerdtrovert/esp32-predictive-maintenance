@@ -38,17 +38,6 @@ export const KPIStat = ({
     }
   };
 
-  const getColorClass = (color: string) => {
-    switch (color) {
-      case 'primary': return 'border-primary/20 bg-primary/5';
-      case 'success': return 'border-success/20 bg-success/5';
-      case 'warning': return 'border-warning/20 bg-warning/5';
-      case 'accent': return 'border-accent/20 bg-accent/5';
-      case 'destructive': return 'border-destructive/20 bg-destructive/5';
-      default: return 'border-border/20 bg-background/5';
-    }
-  };
-
   const getIconColor = (color: string) => {
     switch (color) {
       case 'primary': return 'text-primary';
@@ -60,24 +49,77 @@ export const KPIStat = ({
     }
   };
 
-  // Compute the icon component
+  const getValueColorClass = (titleStr: string, valStr: string) => {
+    const t = titleStr.toLowerCase();
+    const v = valStr.toLowerCase();
+    
+    if (t.includes('health')) {
+      const num = parseFloat(v.replace('%', ''));
+      if (!isNaN(num)) {
+        if (num >= 85) return 'text-industrial-success';
+        if (num >= 70) return 'text-industrial-warning';
+        return 'text-industrial-danger';
+      }
+      return 'text-industrial-success';
+    }
+    
+    if (t.includes('risk')) {
+      if (v.includes('low')) return 'text-industrial-success font-semibold';
+      if (v.includes('med')) return 'text-industrial-warning font-semibold';
+      if (v.includes('high')) return 'text-industrial-danger font-semibold';
+    }
+    
+    if (t.includes('status')) {
+      if (v.includes('online')) {
+        const parts = v.split(' ')[0].split('/');
+        if (parts.length === 2 && parts[0] === parts[1]) {
+          return 'text-industrial-success';
+        }
+        if (parts.length === 2 && parts[0] === '0') {
+          return 'text-industrial-danger';
+        }
+        return 'text-industrial-warning';
+      }
+    }
+    
+    if (t.includes('alert')) {
+      const num = parseInt(v);
+      if (!isNaN(num)) {
+        if (num === 0) return 'text-industrial-success';
+        if (num < 5) return 'text-industrial-warning';
+        return 'text-industrial-danger';
+      }
+    }
+    
+    return 'text-foreground';
+  };
+
   const Icon = IconMap[icon];
-  // Compute the trend icon component
   const TrendIcon = getTrendIcon();
 
   return (
-    <div className="p-4 border rounded-lg text-center">
-      <div className={`${getColorClass(color)} w-10 h-10 flex items-center justify-center rounded-lg mb-3`}>
-        <Icon className={`${getIconColor(color)} h-4 w-4`} />
+    <div className="p-5 border border-border rounded-xl text-center bg-card text-card-foreground shadow-sm hover:shadow-md transition-all duration-200">
+      <div className="flex items-center justify-center space-x-2 mb-3">
+        <Icon className={`${getIconColor(color)} h-4 w-4 opacity-60`} />
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{title}</h3>
       </div>
-      <h3 className="text-sm font-medium text-foreground/60 mb-2">{title}</h3>
-      <p className="text-xl font-bold text-foreground">{value}</p>
+      <p className={`text-3xl font-extrabold ${getValueColorClass(title, value)}`}>{value}</p>
       {trend !== 'neutral' && change && (
-        <div className="flex items-center justify-center mt-2 text-sm">
+        <div className="flex items-center justify-center mt-3 text-xs">
           {TrendIcon && (
-            <TrendIcon className={`h-3 w-3 mr-1 ${trend === 'up' ? 'text-success' : 'text-destructive'}`} />
+            <TrendIcon className={`h-3.5 w-3.5 mr-1 ${
+              color === 'success' ? 'text-success' :
+              color === 'warning' ? 'text-warning' :
+              color === 'destructive' ? 'text-destructive' :
+              trend === 'up' ? 'text-success' : 'text-destructive'
+            }`} />
           )}
-          <span className={`${trend === 'up' ? 'text-success' : 'text-destructive'}`}>{change}</span>
+          <span className={`font-medium ${
+            color === 'success' ? 'text-success' :
+            color === 'warning' ? 'text-warning' :
+            color === 'destructive' ? 'text-destructive' :
+            trend === 'up' ? 'text-success' : 'text-destructive'
+          }`}>{change}</span>
         </div>
       )}
     </div>

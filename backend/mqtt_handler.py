@@ -4,9 +4,13 @@ from collections import defaultdict, deque
 from dataclasses import dataclass, asdict
 from datetime import datetime
 import json
+import logging
 from typing import Any, Deque, Dict, List, Optional
 
 import paho.mqtt.client as mqtt
+
+logger = logging.getLogger("machine_hawk.mqtt")
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 
 
 @dataclass
@@ -127,15 +131,20 @@ class MQTTIngestBridge:
             self._connected = True
             self._last_error = None
             client.subscribe(self._topic_filter, qos=1)
+            logger.info(f"Connected to MQTT broker successfully and subscribed to {self._topic_filter}")
             return
 
         self._connected = False
         self._last_error = f"MQTT connect failed with code {reason_code}"
+        logger.error(f"MQTT connection failed with reason code {reason_code}")
 
     def _on_disconnect(self, _client: mqtt.Client, _userdata: Any, reason_code: int, _properties: Any = None) -> None:
         self._connected = False
         if reason_code != 0:
             self._last_error = f"MQTT disconnected unexpectedly with code {reason_code}"
+            logger.warning(f"MQTT disconnected unexpectedly with code {reason_code}")
+        else:
+            logger.info("MQTT disconnected cleanly from broker")
 
     def _resolve_machine_id(self, topic: str, payload: Dict[str, Any]) -> int:
         if "machine_id" in payload:
@@ -158,7 +167,10 @@ class MQTTIngestBridge:
             self._received_count += 1
             self._last_message_at = datetime.now().isoformat()
             self._last_error = None
+            logger.info(f"Ingested telemetry update for machine {machine_id} on topic {message.topic}")
         except json.JSONDecodeError as exc:
             self._last_error = f"Invalid JSON payload on topic {message.topic}: {exc}"
+            logger.error(self._last_error)
         except (KeyError, TypeError, ValueError) as exc:
             self._last_error = f"Invalid telemetry payload on topic {message.topic}: {exc}"
+            logger.error(self._last_error)

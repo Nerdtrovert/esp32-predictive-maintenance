@@ -9,20 +9,34 @@ export const Alerts = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchAlerts = async () => {
+    let active = true;
+    const fetchAlerts = async (isInitial = false) => {
+      if (isInitial) setLoading(true);
       try {
-        setLoading(true);
         const data = await apiService.getAlerts();
-        setAlerts(data);
+        if (active) {
+          setAlerts(data);
+        }
       } catch (err) {
-        setError('Failed to load alerts');
+        if (active && isInitial) {
+          setError('Failed to load alerts');
+        }
         console.error('Error fetching alerts:', err);
       } finally {
-        setLoading(false);
+        if (active && isInitial) setLoading(false);
       }
     };
 
-    fetchAlerts();
+    fetchAlerts(true);
+
+    const interval = setInterval(() => {
+      fetchAlerts(false);
+    }, 2000);
+
+    return () => {
+      active = false;
+      clearInterval(interval);
+    };
   }, []);
 
   if (loading) {

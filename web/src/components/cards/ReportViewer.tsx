@@ -305,7 +305,7 @@ export const ReportViewer = ({ reportId, onReportNotFound }: ReportViewerProps) 
               <BarChart3 className="h-4 w-4 text-industrial-accent" />
               Key Metrics
             </h3>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-4 sm:grid-cols-2">
               {reportData.data.metrics.map((metric: any, index: number) => (
                 <div key={index} className="p-4 rounded-lg border border-border/50 hover:bg-accent/5 transition-colors">
                   <div className="flex items-center space-x-3">

@@ -9,20 +9,34 @@ export const HealthTrend = ({ machineId = 1 }: { machineId?: number }) => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchHealthData = async () => {
+    let active = true;
+    const fetchHealthData = async (isInitial = false) => {
+      if (isInitial) setLoading(true);
       try {
-        setLoading(true);
         const data = await apiService.getMachineHealth(machineId);
-        setHealthData(data);
+        if (active) {
+          setHealthData(data);
+        }
       } catch (err) {
-        setError('Failed to load health data');
+        if (active && isInitial) {
+          setError('Failed to load health data');
+        }
         console.error('Error fetching health data:', err);
       } finally {
-        setLoading(false);
+        if (active && isInitial) setLoading(false);
       }
     };
 
-    fetchHealthData();
+    fetchHealthData(true);
+
+    const interval = setInterval(() => {
+      fetchHealthData(false);
+    }, 2000);
+
+    return () => {
+      active = false;
+      clearInterval(interval);
+    };
   }, [machineId]);
 
   // Mock data for fallback
@@ -111,12 +125,12 @@ export const HealthTrend = ({ machineId = 1 }: { machineId?: number }) => {
             <div className="mt-3 space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-sm">Temperature Stability</span>
-                <span className="text-sm font-medium">
-                  {data.indicators.temperature_stability === 'Good'
+                <span className={`text-sm font-medium ${
+                  data.indicators.temperature_stability === 'Good'
                     ? 'text-industrial-success'
-                    : data.indicators.temperature_stability === 'Warning'
-                      ? 'text-industrial-warning'
-                      : 'text-industrial-danger'}
+                    : 'text-industrial-warning'
+                }`}>
+                  {data.indicators.temperature_stability}
                 </span>
               </div>
               <div className="w-full bg-border/50 rounded-lg h-2 mt-1">
@@ -135,12 +149,14 @@ export const HealthTrend = ({ machineId = 1 }: { machineId?: number }) => {
 
               <div className="flex items-center justify-between">
                 <span className="text-sm">Vibration Levels</span>
-                <span className="text-sm font-medium">
-                  {data.indicators.vibration_levels === 'Good'
+                <span className={`text-sm font-medium ${
+                  data.indicators.vibration_levels === 'Good'
                     ? 'text-industrial-success'
                     : data.indicators.vibration_levels === 'Moderate'
                       ? 'text-industrial-warning'
-                      : 'text-industrial-danger'}
+                      : 'text-industrial-danger'
+                }`}>
+                  {data.indicators.vibration_levels}
                 </span>
               </div>
               <div className="w-full bg-border/50 rounded-lg h-2 mt-1">
@@ -159,12 +175,12 @@ export const HealthTrend = ({ machineId = 1 }: { machineId?: number }) => {
 
               <div className="flex items-center justify-between">
                 <span className="text-sm">Power Efficiency</span>
-                <span className="text-sm font-medium">
-                  {data.indicators.power_efficiency === 'Optimal'
+                <span className={`text-sm font-medium ${
+                  data.indicators.power_efficiency === 'Optimal'
                     ? 'text-industrial-success'
-                    : data.indicators.power_efficiency === 'Suboptimal'
-                      ? 'text-industrial-warning'
-                      : 'text-industrial-danger'}
+                    : 'text-industrial-warning'
+                }`}>
+                  {data.indicators.power_efficiency}
                 </span>
               </div>
               <div className="w-full bg-border/50 rounded-lg h-2 mt-1">
@@ -215,40 +231,42 @@ export const HealthTrend = ({ machineId = 1 }: { machineId?: number }) => {
 
           <div className="mt-4 pt-4 border-t border-border/50">
             <div className="flex items-center space-x-3 mb-3">
-              <TrendingUp className="h-4 w-4 text-industrial-primary" />
+              <TrendingUp className="h-4 w-4 text-primary" />
               <h3 className="text-sm font-medium text-foreground/60">24-Hour Trend</h3>
             </div>
-            <div className="h-32 border border-border/50 rounded-lg p-4">
-              <div className="flex h-full items-center justify-center">
+            <div className="h-40 border border-border/50 rounded-lg p-3">
+              <div className="flex flex-col h-full justify-between w-full">
                 {data.health_trend && data.health_trend.length > 0 ? (
                   <>
-                    <svg width="100%" height="100%" className="block">
-                      <polyline
-                        points={data.health_trend
-                          .map((point: number, index: number) => {
-                            const x = (index / (data.health_trend.length - 1)) * 100;
-                            const y = 100 - ((point - 70) / 40) * 100; // Normalize 70-110 range
-                            return `${x}%,${y}%`;
-                          })
-                          .join(' ')}
-                        fill="none"
-                        stroke="industrial-primary"
-                        stroke-width="2"
-                      />
-                    </svg>
+                    <div className="h-24 w-full relative">
+                      <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-full block">
+                        <polyline
+                          points={data.health_trend
+                            .map((point: number, index: number) => {
+                              const x = (index / (data.health_trend.length - 1)) * 100;
+                              const y = 100 - ((point - 70) / 30) * 100; // Normalize 70-100 range
+                              return `${x},${y}`;
+                            })
+                            .join(' ')}
+                          fill="none"
+                          stroke="#3b82f6"
+                          strokeWidth="2"
+                        />
+                      </svg>
+                    </div>
                     <div className="mt-2 text-center text-xs text-muted-foreground">
                       Trend chart visualization
                     </div>
                   </>
                 ) : (
-                  <div className="text-center text-muted-foreground">
+                  <div className="text-center text-muted-foreground m-auto">
                     Trend chart visualization would appear here<br />
                     <span className="text-xs">Shows health score fluctuations over time</span>
                   </div>
                 )}
               </div>
+            </div>
           </div>
-        </div>
         </CardContent>
       </Card>
     );

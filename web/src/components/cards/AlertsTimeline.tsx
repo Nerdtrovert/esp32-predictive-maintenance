@@ -62,7 +62,7 @@ export const AlertsTimeline = ({ alerts }: AlertsTimelineProps) => {
                 <CheckCircle2 className="h-5 w-5 text-industrial-success" />
               </div>
             )}
-            <div className="flex-1 space-y-2">
+            <div className="flex-1 space-y-1">
               <div className="flex justify-between items-start">
                 <h3 className="font-medium text-sm">{alert.message}</h3>
                 <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
@@ -77,25 +77,13 @@ export const AlertsTimeline = ({ alerts }: AlertsTimelineProps) => {
                   {alert.type.toUpperCase()}
                 </span>
               </div>
-              <p className="text-sm text-muted-foreground">{alert.time}</p>
-              <div className="flex items-center space-x-2 text-xs">
-                <div
-                  className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                    alert.type === 'warning'
-                      ? 'bg-industrial-warning/10 text-industrial-warning'
-                      : alert.type === 'error'
-                        ? 'bg-industrial-danger/10 text-industrial-danger'
-                        : alert.type === 'info'
-                          ? 'bg-industrial-info/10 text-industrial-info'
-                          : 'bg-industrial-success/10 text-industrial-success'
-                  }`}>
-                  {alert.type.toUpperCase()}
-                </div>
-                <div className="h-2 w-2 rounded-full"
+              <div className="flex items-center space-x-2 text-xs text-muted-foreground">
+                <span>{alert.time}</span>
+                <div className="h-1.5 w-1.5 rounded-full"
                      style={{ backgroundColor:
                        alert.type === 'warning' ? '#f59e0b' :
                        alert.type === 'error' ? '#ef4444' :
-                       alert.type === 'info' ? '3b82f6' :
+                       alert.type === 'info' ? '#3b82f6' :
                        '#10b981' }}></div>
               </div>
             </div>

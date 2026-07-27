@@ -14,22 +14,34 @@ export const MachineDetails = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchData = async () => {
+    let active = true;
+    const fetchData = async (isInitial = false) => {
+      if (isInitial) setLoading(true);
       try {
-        setLoading(true);
-
-        // Fetch machine details
         const machine = await apiService.getMachineDetails(machineId);
-        setMachineData(machine);
+        if (active) {
+          setMachineData(machine);
+        }
       } catch (err) {
-        setError('Failed to load machine data');
+        if (active && isInitial) {
+          setError('Failed to load machine data');
+        }
         console.error('Error fetching machine data:', err);
       } finally {
-        setLoading(false);
+        if (active && isInitial) setLoading(false);
       }
     };
 
-    fetchData();
+    fetchData(true);
+
+    const interval = setInterval(() => {
+      fetchData(false);
+    }, 2000);
+
+    return () => {
+      active = false;
+      clearInterval(interval);
+    };
   }, [machineId]);
 
   if (loading) {

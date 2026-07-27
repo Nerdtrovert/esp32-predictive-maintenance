@@ -36,8 +36,8 @@ const unsigned long RECONNECT_DELAY_MS = 2000;
 const long SERIAL_BAUD_RATE = 115200;
 
 // ================== Anomaly Detection Thresholds ==================
-const float TEMP_THRESHOLD = 32.5f;
-const float PRED_TEMP_THRESHOLD = 34.0f;
+const float TEMP_THRESHOLD = 28.0f;
+const float PRED_TEMP_THRESHOLD = 30.0f;
 const float ML_ANOMALY_THRESHOLD = 75.0f;
 
 #endif // CONFIG_H

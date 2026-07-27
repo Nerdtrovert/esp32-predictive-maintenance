@@ -16,19 +16,34 @@ export const RecommendedActions = () => {
   };
 
   useEffect(() => {
-    const fetchRecs = async () => {
+    let active = true;
+    const fetchRecs = async (isInitial = false) => {
+      if (isInitial) setLoading(true);
       try {
-        setLoading(true);
         const data = await apiService.getMaintenanceRecommendations();
-        setRecommendations(data);
+        if (active) {
+          setRecommendations(data);
+        }
       } catch (err) {
-        setError('Failed to load recommended actions');
+        if (active && isInitial) {
+          setError('Failed to load recommended actions');
+        }
         console.error('Error fetching maintenance recommendations:', err);
       } finally {
-        setLoading(false);
+        if (active && isInitial) setLoading(false);
       }
     };
-    fetchRecs();
+
+    fetchRecs(true);
+
+    const interval = setInterval(() => {
+      fetchRecs(false);
+    }, 2000);
+
+    return () => {
+      active = false;
+      clearInterval(interval);
+    };
   }, []);
 
   const defaultRecommendations = [

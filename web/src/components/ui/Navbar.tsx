@@ -1,31 +1,47 @@
-import {
-  Search,
-  Bell
-} from 'lucide-react';
+import { Bell } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
-export const Navbar = () => {
+interface NavbarProps {
+  unreadCount?: number;
+  onClearUnread?: () => void;
+}
+
+export const Navbar = ({ unreadCount = 0, onClearUnread }: NavbarProps) => {
   return (
-    <header className="h-16 bg-card text-card-foreground border-bell text-card-foreground border-b border-border px-6 flex items-center justify-between flex-shrink-0">
-      <div className="flex items-center space-x-4 flex-shrink-0">
-        <h1 className="text-xl font-semibold flex-shrink-0">Machine Hawk Dashboard</h1>
+    <header className="h-16 bg-card text-card-foreground border-b border-border px-6 flex items-center justify-between flex-shrink-0">
+      <div className="flex items-center space-x-3 flex-shrink-0">
+        <img
+          src="/assets/logo.png"
+          alt="Machine Hawk Logo"
+          className="h-8 w-8 flex-shrink-0"
+        />
+        <h1 className="text-xl font-semibold flex-shrink-0">Machine Hawk</h1>
       </div>
 
       <div className="flex items-center space-x-4 flex-shrink-0">
         <div className="relative flex-shrink-0">
-          <button className="p-2 rounded-md hover:bg-accent/5 flex-shrink-0">
+          <Link
+            to="/alerts"
+            onClick={onClearUnread}
+            className="p-2 rounded-md hover:bg-accent/5 flex-shrink-0 block relative"
+          >
             <Bell className="h-4 w-4 flex-shrink-0" />
-            <span className="absolute -top-1 -right-1 h-2 w-2 bg-danger rounded-full" />
-          </button>
+            {unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1 h-4 w-4 bg-danger text-white text-[10px] font-bold flex items-center justify-center rounded-full">
+                {unreadCount}
+              </span>
+            )}
+          </Link>
         </div>
 
         <div className="relative flex-shrink-0">
           <button className="flex items-center space-x-2 p-2 rounded-md hover:bg-accent/5 flex-shrink-0">
             <img
-              src="https://via.placeholder.com/32"
+              src="/assets/logo.png"
               alt="User avatar"
-              className="h-8 w-8 rounded-full flex-shrink-0"
+              className="h-8 w-8 rounded-full flex-shrink-0 object-cover"
             />
-            <span className="hidden md:inline flex-shrink-0">Operator</span>
+            <span className="hidden md:inline flex-shrink-0">User</span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-4 w-4 flex-shrink-0"
