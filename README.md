@@ -44,8 +44,6 @@ flowchart LR
     MQTT <--> Cloud["ThingsBoard dashboard and RPC"]
 ```
 
-[![System architecture](docs/architecture-diagram.png)](docs/architecture-diagram.png)
-
 ## Tech Stack
 
 | Area | Technology |
@@ -193,45 +191,51 @@ If the TinyML classification score exceeds the threshold, or the current/predict
 This project is licensed under the [MIT License](LICENSE).
 
 
-  To make pio run --target upload work out-of-the-box on Ubuntu, configure your user permissions first:
+  ## Ubuntu Setup Tips (Optional)
+To make `pio run --target upload` work out-of-the-box on Ubuntu:
+1. Add your user to the dialout group (grants serial port access):
+   ```bash
+   sudo usermod -a -G dialout $USER
+   ```
+   *(Note: You will need to log out of Ubuntu and log back in for this to take effect).*
+2. Install PlatformIO's udev rules (helps identify and set permissions for all USB microcontrollers):
+   ```bash
+   curl -fsSL https://raw.githubusercontent.com/platformio/platformio-core/master/platformio/assets/system/99-platformio-udev.rules | sudo tee /etc/udev/rules.d/99-platformio-udev.rules
+   sudo udevadm control --reload-rules
+   sudo udevadm trigger
+   ```
+  ## How to Run
 
-  1. Add your user to the dialout group (grants serial port access):
-    sudo usermod -a -G dialout $USER
-    (Note: You will need to log out of Ubuntu and log back in for this to take effect).
-  2. Install PlatformIO's udev rules (helps identify and set permissions for all USB microcontrollers):
-    curl -fsSL https://raw.githubusercontent.com/platformio/platformio-core/master/platformio/assets/system/99-platformio-udev.rules | sudo
-  tee /etc/udev/rules.d/99-platformio-udev.rules
-    sudo udevadm control --reload-rules
-    sudo udevadm trigger
+1. **Backend**:
+   ```bash
+   cd backend
+   python3 -m venv .venv
+   source .venv/bin/activate
+   pip install -r requirements.txt
+   # Optional MQTT broker overrides for backend subscriber:
+   # export MQTT_BROKER_HOST=broker.hivemq.com
+   # export MQTT_BROKER_PORT=1883
+   # export MQTT_TOPIC_FILTER=machine-hawk/telemetry/+
+   # export MQTT_ENABLE_SEED_DATA=true  # optional demo-only seeded data
+   python app.py
+   API will be available at http://localhost:8000
+   # when done:
+   deactivate
+   ```
 
+2. **Frontend**:
+   ```bash
+   cd web
+   npm install  # if not already done
+   npm run dev
+   ```
+   Frontend uses `/api` proxy to backend by default.
+   Optional override: set `VITE_API_URL` (example: `VITE_API_URL=http://localhost:8000`).
 
-
-
-  ⚙️  How to Run
-
-  1. Backend:
-  cd backend
-  python3 -m venv .venv
-  source .venv/bin/activate
-  pip install -r requirements.txt
-  # Optional MQTT broker overrides for backend subscriber:
-  # export MQTT_BROKER_HOST=broker.hivemq.com
-  # export MQTT_BROKER_PORT=1883
-  # export MQTT_TOPIC_FILTER=machine-hawk/telemetry/+
-  # export MQTT_ENABLE_SEED_DATA=true  # optional demo-only seeded data
-  python app.py
-  API will be available at http://localhost:8000
-  # when done:
-  deactivate
-
-  2. Frontend:
-  cd web
-  npm install  # if not already done
-  npm run dev
-  Frontend uses `/api` proxy to backend by default.
-  Optional override: set `VITE_API_URL` (example: `VITE_API_URL=http://localhost:8000`).
-
-  3. MQTT wiring:
-  - ESP32 publishes telemetry to `machine-hawk/telemetry/1`
-  - Backend subscribes to `machine-hawk/telemetry/+`
-  - Verify bridge health at `GET /api/mqtt/status`
+3. **MQTT wiring**:
+   ```bash
+   # These are informational - no commands to run
+   ```
+   - ESP32 publishes telemetry to `machine-hawk/telemetry/1`
+   - Backend subscribes to `machine-hawk/telemetry/+`
+   - Verify bridge health at `GET /api/mqtt/status`
