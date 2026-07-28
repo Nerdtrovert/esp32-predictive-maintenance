@@ -23,9 +23,6 @@ from recommendation_engine import (
 
 MACHINE_CATALOG: Dict[int, str] = {
     1: "Press Line Alpha",
-    2: "Conveyor Belt Beta",
-    3: "Hydraulic Press Gamma",
-    4: "Assembly Line Delta",
 }
 
 telemetry_store = TelemetryStore()
@@ -47,9 +44,6 @@ MQTT_ENABLE_SEED_DATA = os.getenv("MQTT_ENABLE_SEED_DATA", "true").strip().lower
 
 SEED_TELEMETRY: Dict[int, Dict[str, Any]] = {
     1: {"temperature": 29.1, "predicted_temp": 30.0, "anomaly_score": 21.8, "anomaly": False},
-    2: {"temperature": 31.7, "predicted_temp": 33.2, "anomaly_score": 58.4, "anomaly": False},
-    3: {"temperature": 34.6, "predicted_temp": 36.8, "anomaly_score": 84.7, "anomaly": True},
-    4: {"temperature": 28.3, "predicted_temp": 29.2, "anomaly_score": 17.3, "anomaly": False},
 }
 
 if MQTT_ENABLE_SEED_DATA:

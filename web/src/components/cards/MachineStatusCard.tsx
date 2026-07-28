@@ -70,7 +70,7 @@ export const MachineStatusCard = ({
   const healthConfig = getHealthLabel(health);
 
   return (
-    <div className="p-4 border border-border rounded-xl bg-card text-card-foreground shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between h-[120px]">
+    <div className="p-4 border border-border rounded-xl bg-card text-card-foreground shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between h-full min-h-[152px]">
       <div>
         <div className="flex items-center justify-between mb-2.5 border-b border-border/50 pb-1.5">
           <h3 className="font-semibold text-sm text-foreground">{name}</h3>
@@ -80,7 +80,7 @@ export const MachineStatusCard = ({
           </div>
         </div>
         
-        <div className="space-y-2.5 text-sm">
+        <div className="space-y-3 text-sm">
           {/* Health Row with custom label */}
           <div>
             <div className="flex justify-between items-baseline mb-1">
@@ -106,15 +106,22 @@ export const MachineStatusCard = ({
             </div>
           </div>
 
-          {/* Temperature & Vibration Inline Row */}
-          <div className="flex items-center justify-between text-xs text-muted-foreground pt-0.5">
-            <div className="flex items-center space-x-1.5">
-              <Thermometer className="h-3.5 w-3.5 text-industrial-warning flex-shrink-0" />
-              <span>Temp: <strong className="text-foreground font-semibold">{temperature.toFixed(1)}°C</strong></span>
+          {/* Temperature & Vibration Grid (Compact nested cards) */}
+          <div className="grid grid-cols-2 gap-2.5 pt-0.5">
+            <div className="bg-accent/5 p-2 rounded-lg border border-border/50 flex items-center space-x-2 h-11">
+              <Thermometer className="h-4 w-4 text-industrial-warning flex-shrink-0" />
+              <div className="flex flex-col min-w-0">
+                <span className="text-[8px] text-muted-foreground font-bold uppercase tracking-wider leading-none mb-0.5">Temp</span>
+                <span className="text-xs font-bold text-foreground leading-none truncate">{temperature.toFixed(1)}°C</span>
+              </div>
             </div>
-            <div className="flex items-center space-x-1.5">
-              <Activity className="h-3.5 w-3.5 text-industrial-danger flex-shrink-0" />
-              <span>Vibe: <strong className="text-foreground font-semibold">{vibration.toFixed(2)} mm/s</strong></span>
+
+            <div className="bg-accent/5 p-2 rounded-lg border border-border/50 flex items-center space-x-2 h-11">
+              <Activity className="h-4 w-4 text-industrial-danger flex-shrink-0" />
+              <div className="flex flex-col min-w-0">
+                <span className="text-[8px] text-muted-foreground font-bold uppercase tracking-wider leading-none mb-0.5">Vibration</span>
+                <span className="text-xs font-bold text-foreground leading-none truncate">{vibration.toFixed(2)} mm/s</span>
+              </div>
             </div>
           </div>
         </div>

@@ -38,7 +38,7 @@ export const RecentAlerts = () => {
 
   if (loading) {
     return (
-      <Card className="h-full flex flex-col justify-center min-h-[256px]">
+      <Card className="h-full flex flex-col justify-center min-h-[152px]">
         <CardContent className="flex items-center justify-center p-6">
           <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
         </CardContent>
@@ -48,7 +48,7 @@ export const RecentAlerts = () => {
 
   if (error) {
     return (
-      <Card className="h-full flex flex-col justify-center min-h-[256px]">
+      <Card className="h-full flex flex-col justify-center min-h-[152px]">
         <CardContent className="flex items-center justify-center p-6 text-destructive text-sm font-medium">
           <p>{error}</p>
         </CardContent>
@@ -57,7 +57,7 @@ export const RecentAlerts = () => {
   }
 
   return (
-    <Card className="h-full flex flex-col justify-between min-h-[256px]">
+    <Card className="h-full flex flex-col justify-between min-h-[152px]">
       <CardContent className="flex-1 flex flex-col justify-between p-6">
         <div className="space-y-3 flex-1 flex flex-col justify-between">
           <div className="space-y-3">

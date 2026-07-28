@@ -41,12 +41,10 @@ export const MachineStatusGrid = () => {
 
   if (loading) {
     return (
-      <div className="grid md:grid-cols-2 gap-4">
-        {Array(4).fill(null).map((_, i) => (
-          <div key={i} className="p-5 border border-border rounded-xl bg-card h-48 flex items-center justify-center">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-          </div>
-        ))}
+      <div className="grid gap-4">
+        <div className="p-5 border border-border rounded-xl bg-card h-[152px] flex items-center justify-center">
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+        </div>
       </div>
     );
   }
@@ -60,7 +58,7 @@ export const MachineStatusGrid = () => {
   }
 
   return (
-    <div className="grid md:grid-cols-2 gap-4">
+    <div className="grid gap-4">
       {machines.map(machine => (
         <MachineStatusCard key={machine.id} {...machine} />
       ))}
