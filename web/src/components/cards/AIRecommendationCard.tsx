@@ -1,11 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { Card, CardHeader, CardContent } from '../ui/Card';
-import { BrainCircuit, Play, Eye } from 'lucide-react';
+import { Card, CardContent } from '../ui/Card';
+import { BrainCircuit, Play, Eye, Loader2, CheckCircle2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import apiService from '../../services/apiService';
 
 export const AIRecommendationCard = () => {
   const [recommendations, setRecommendations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isDiagnosing, setIsDiagnosing] = useState(false);
+  const [diagnosticResult, setDiagnosticResult] = useState<string | null>(null);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     let active = true;
@@ -34,13 +39,14 @@ export const AIRecommendationCard = () => {
   const getRecDetails = (rec: any) => {
     if (!rec) {
       return {
+        machine_id_val: 1,
         machine_name: 'Factory Fleet',
         title: 'Maintain Current Operating Profile',
         bullets: [
-          'All machinery operating within baseline vibration.',
-          'Thermal stability remains optimal across active nodes.',
-          'No high-risk anomaly signals detected.',
-          'Continue routine preventive inspections.'
+          'Monitor telemetry parameters.',
+          'Verify sensor calibrations.',
+          'Compare baseline signatures.',
+          'Schedule regular preventive checks.'
         ]
       };
     }
@@ -54,7 +60,6 @@ export const AIRecommendationCard = () => {
       }
     }
 
-    // Generate structured bullets based on recommendation type
     let bullets = [
       'Monitor telemetry parameters.',
       'Verify sensor calibrations.',
@@ -86,6 +91,7 @@ export const AIRecommendationCard = () => {
     }
 
     return {
+      machine_id_val: 1, // Fallback to 1 as it is the only active hardware node
       machine_name: machineName,
       title: rec.title,
       bullets: bullets
@@ -93,6 +99,25 @@ export const AIRecommendationCard = () => {
   };
 
   const details = getRecDetails(recommendations[0]);
+
+  const handleRunDiagnostic = async () => {
+    if (isDiagnosing) return;
+    setIsDiagnosing(true);
+    setDiagnosticResult(null);
+    try {
+      const data = await apiService.runMachineDiagnostic(details.machine_id_val);
+      setDiagnosticResult(data.message || 'Diagnostic scan completed successfully.');
+      // Auto-clear diagnostic notice box after 5 seconds
+      setTimeout(() => {
+        setDiagnosticResult(null);
+      }, 5000);
+    } catch (err) {
+      console.error('Diagnostic error:', err);
+      setDiagnosticResult('Failed to establish diagnostic handshake connection.');
+    } finally {
+      setIsDiagnosing(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -126,12 +151,32 @@ export const AIRecommendationCard = () => {
           </ul>
         </div>
 
+        {/* Diagnostic Results Status Message */}
+        {diagnosticResult && (
+          <div className="p-2.5 rounded-lg border border-industrial-success/20 bg-industrial-success/5 text-[10px] text-industrial-success font-medium flex items-start space-x-2 animate-slide-in">
+            <CheckCircle2 className="h-3.5 w-3.5 flex-shrink-0 mt-0.5" />
+            <span>{diagnosticResult}</span>
+          </div>
+        )}
+
         <div className="grid grid-cols-2 gap-3 pt-2">
-          <button className="flex items-center justify-center space-x-1.5 px-3 py-2 bg-primary text-primary-foreground text-xs font-semibold rounded-lg hover:bg-primary/95 transition-colors">
-            <Play className="h-3 w-3" />
-            <span>Run Diagnostic</span>
+          <button
+            onClick={handleRunDiagnostic}
+            disabled={isDiagnosing}
+            className="flex items-center justify-center space-x-1.5 px-3 py-2 bg-primary text-primary-foreground text-xs font-semibold rounded-lg hover:bg-primary/95 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isDiagnosing ? (
+              <Loader2 className="h-3 w-3 animate-spin" />
+            ) : (
+              <Play className="h-3 w-3" />
+            )}
+            <span>{isDiagnosing ? 'Running...' : 'Run Diagnostic'}</span>
           </button>
-          <button className="flex items-center justify-center space-x-1.5 px-3 py-2 border border-border bg-card text-foreground text-xs font-semibold rounded-lg hover:bg-accent/5 transition-colors">
+          
+          <button
+            onClick={() => navigate(`/machine/${details.machine_id_val}`)}
+            className="flex items-center justify-center space-x-1.5 px-3 py-2 border border-border bg-card text-foreground text-xs font-semibold rounded-lg hover:bg-accent/5 transition-colors"
+          >
             <Eye className="h-3 w-3" />
             <span>View Machine</span>
           </button>

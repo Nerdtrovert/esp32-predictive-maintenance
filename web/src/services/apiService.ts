@@ -28,6 +28,7 @@ const apiService = {
   getMachineDetails: async (machineId: number | string) => (await apiClient.get(`/machine/${machineId}`)).data,
   getMachineSensorData: async (machineId: number | string) => (await apiClient.get(`/machine/${machineId}/sensors`)).data,
   getMachineHealth: async (machineId: number | string) => (await apiClient.get(`/machine/${machineId}/health`)).data,
+  runMachineDiagnostic: async (machineId: number | string) => (await apiClient.post(`/machine/${machineId}/diagnostic`)).data,
 
   getAIAnalysis: async () => (await apiClient.get('/ai/analysis')).data,
   getAIRecommendations: async () => (await apiClient.get('/ai/recommendations')).data,

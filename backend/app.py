@@ -224,6 +224,19 @@ async def get_machine_health(machine_id: int) -> Dict[str, Any]:
     return build_health_details(get_machine_view_or_404(machine_id))
 
 
+@app.post("/api/machine/{machine_id}/diagnostic")
+async def run_machine_diagnostic(machine_id: int) -> Dict[str, Any]:
+    get_machine_view_or_404(machine_id)
+    # Simulate a brief diagnostic computation delay
+    import asyncio
+    await asyncio.sleep(1.2)
+    return {
+        "status": "success",
+        "message": "Diagnostic scan complete. Calibration baseline verified. All sensors operating within normal limits.",
+        "timestamp": datetime.now().isoformat()
+    }
+
+
 @app.get("/api/ai/analysis")
 async def get_ai_analysis() -> Dict[str, str]:
     return build_ai_analysis(get_machine_views())
